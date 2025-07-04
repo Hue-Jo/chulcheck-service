@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>반 선택</title>
+</head>
+<body>
+<h1>출석 체크 시작</h1>
+
+<form action="/attendance/form" method="get">
+
+  <label>셀 선택:</label>
+  <select name="cellId">
+    <option th:each="cell : ${cells}" th:value="${cell.id}" th:text="${cell.name}"></option>
+  </select>
+
+  <button type="submit">출석체크 페이지로 이동</button>
+</form>
+
+</body>
+</html>

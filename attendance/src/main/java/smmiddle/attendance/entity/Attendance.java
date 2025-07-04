@@ -8,7 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
-import smmiddle.attendance.AttendanceStatus;
+import smmiddle.attendance.constant.AttendanceStatus;
 
 @Entity
 public class Attendance {
