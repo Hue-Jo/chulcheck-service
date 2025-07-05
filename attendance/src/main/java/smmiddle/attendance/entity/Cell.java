@@ -7,8 +7,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
 
 @Entity
+@Getter
 public class Cell {
 
   @Id

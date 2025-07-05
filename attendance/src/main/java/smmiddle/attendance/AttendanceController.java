@@ -10,12 +10,12 @@ import smmiddle.attendance.repository.CellRepository;
 @RequiredArgsConstructor
 public class AttendanceController {
 
-  private final CellRepository cellRepository;
+  private final AttendanceService attendanceService;
 
   // 첫 화면에서 셀 목록 조회
   @GetMapping("/")
   public String showCellSelectForm(Model model) {
-    model.addAttribute("cells", cellRepository.findAll());
+    model.addAttribute("cells", attendanceService.getAllCells());
     return "select_cell";
   }
 
