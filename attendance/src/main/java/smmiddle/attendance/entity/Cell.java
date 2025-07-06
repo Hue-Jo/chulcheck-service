@@ -19,6 +19,8 @@ public class Cell {
 
   private String name;
 
+  private String teacher;
+
   @OneToMany(mappedBy = "cell")
   private List<Student> students = new ArrayList<>();
 

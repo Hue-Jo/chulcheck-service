@@ -10,5 +10,5 @@ import smmiddle.attendance.entity.Student;
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
 
-  List<Student> findByCell(Cell cell);
+  List<Student> findByCell_Id(Long id);
 }

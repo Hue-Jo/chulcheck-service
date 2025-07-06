@@ -24,8 +24,6 @@ public class Attendance {
 
   private String absenceReason;
 
-  private String markedBy; // 출석 체크 교사
-
   @ManyToOne
   private Student student;
 
