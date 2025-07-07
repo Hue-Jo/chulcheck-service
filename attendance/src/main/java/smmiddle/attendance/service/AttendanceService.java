@@ -1,11 +1,9 @@
-package smmiddle.attendance;
+package smmiddle.attendance.service;
 
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import smmiddle.attendance.constant.AttendanceStatus;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
 import smmiddle.attendance.repository.AttendanceRepository;
@@ -28,12 +26,18 @@ public class AttendanceService {
   }
 
   /**
+   * 특정 셀 조회
+   */
+  public Cell getCellById(Long cellId) {
+    return cellRepository.findById(cellId)
+        .orElseThrow(() -> new IllegalArgumentException("해당 셀이 존재하지 않습니다."));
+  }
+
+  /**
    * 셀별 학생들 조회
    */
-  public List<Student> getAllStudentsByCell(Long cellId) {
-    Cell cell = cellRepository.findById(cellId)
-        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 셀입니다."));
-    return studentRepository.findByCell(cell);
+  public List<Student> getAllStudentsByCellId(Long cellId) {
+    return studentRepository.findByCell_Id(cellId);
   }
 
   /**
