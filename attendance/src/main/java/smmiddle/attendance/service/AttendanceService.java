@@ -75,9 +75,5 @@ public class AttendanceService {
     }
     attendanceRepository.saveAll(attendances);
   }
-
-
-
-
-
+  
 }

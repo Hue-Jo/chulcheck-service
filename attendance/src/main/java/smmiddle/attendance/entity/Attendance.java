@@ -10,11 +10,13 @@ import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import smmiddle.attendance.constant.AttendanceStatus;
 
 @Entity
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Attendance {
