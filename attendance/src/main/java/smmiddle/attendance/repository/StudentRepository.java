@@ -9,6 +9,6 @@ import smmiddle.attendance.entity.Student;
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
-
   List<Student> findByCell_Id(Long id);
+
 }

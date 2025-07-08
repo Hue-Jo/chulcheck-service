@@ -1,9 +1,14 @@
 package smmiddle.attendance.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import smmiddle.attendance.constant.AttendanceStatus;
+import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
 import smmiddle.attendance.repository.AttendanceRepository;
@@ -41,11 +46,34 @@ public class AttendanceService {
   }
 
   /**
+   * 출석 체크 여부 확인
+   */
+  public boolean alreadySubmitted(Long cellId, LocalDate date) {
+    return attendanceRepository.existsByStudent_Cell_IdAndDate(cellId, date);
+  }
+
+  /**
    * 출석 정보 저장
    */
   @Transactional
-  public void saveAttendance() {
+  public void saveAttendance(HttpServletRequest request, Long cellId, LocalDate date) {
+    List<Student> students = studentRepository.findByCell_Id(cellId);
+    List<Attendance> attendances = new ArrayList<>();
 
+    for (Student student : students) {
+      String statusParam = request.getParameter("status_" + student.getId());
+      String reasonParam = request.getParameter("reason_" + student.getId());
+
+      AttendanceStatus status = AttendanceStatus.valueOf(statusParam);
+      Attendance attendance = Attendance.builder()
+          .student(student)
+          .date(date)
+          .status(status)
+          .reason(status == AttendanceStatus.ABSENT ? reasonParam : null)
+          .build();
+      attendances.add(attendance);
+    }
+    attendanceRepository.saveAll(attendances);
   }
 
 

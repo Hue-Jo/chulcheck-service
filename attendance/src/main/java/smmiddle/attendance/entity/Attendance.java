@@ -8,9 +8,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import smmiddle.attendance.constant.AttendanceStatus;
 
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Attendance {
 
   @Id
@@ -22,7 +28,7 @@ public class Attendance {
   @Enumerated(EnumType.STRING)
   private AttendanceStatus status;
 
-  private String absenceReason;
+  private String reason;
 
   @ManyToOne
   private Student student;
