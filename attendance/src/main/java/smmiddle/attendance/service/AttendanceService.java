@@ -4,10 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import smmiddle.attendance.constant.AttendanceStatus;
+import smmiddle.attendance.dto.AttendanceResponse;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
@@ -75,5 +78,15 @@ public class AttendanceService {
     }
     attendanceRepository.saveAll(attendances);
   }
-  
+
+
+  public List<LocalDate> getAllAttendanceDates() {
+    return  attendanceRepository.findDistinctDates();
+  }
+
+  // 셀 ID + 날짜로 출석 정보 가져오기
+  public List<Attendance> getAttendancesByCellIdAndDate(Long cellId, LocalDate date) {
+    return attendanceRepository.findByStudent_Cell_IdAndDate(cellId, date);
+  }
+
 }

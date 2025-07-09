@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import smmiddle.attendance.constant.AttendanceStatus;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
@@ -78,6 +79,46 @@ public class AttendanceController {
     attendanceService.saveAttendance(request, cellId, attendanceDate);
     redirectAttributes.addFlashAttribute("success", "✅ 성공적으로 제출되었습니다.");
     return "redirect:/";
+  }
+
+  @GetMapping("/attendance/records")
+  public String viewAttendanceRecords(
+      @RequestParam(name = "cellId", required = false) Long cellId,
+      @RequestParam(name = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+      Model model) {
+
+    // 셀 목록 전달 (셀 선택용 드롭다운)
+    List<Cell> cells = attendanceService.getAllCells();
+    model.addAttribute("cells", cells);
+
+    // 날짜 목록 전달 (출석 기록 있는 날짜만)
+    List<LocalDate> attendanceDates = attendanceService.getAllAttendanceDates();
+    model.addAttribute("dates", attendanceDates);
+
+    // 셀이나 날짜가 선택되지 않았다면 조회 결과는 null (폼만 보여줌)
+    if (cellId == null || cellId == 0 || date == null) {
+      return "attendance_records";
+    }
+
+    // 출석 기록 조회
+    List<Attendance> attendances = attendanceService.getAttendancesByCellIdAndDate(cellId, date);
+    long presentCount = attendances.stream()
+        .filter(att -> att.getStatus() == AttendanceStatus.PRESENT)
+        .count();
+
+    // 셀 이름 (선택한 셀 ID로 조회)
+    String selectedCellName = cells.stream()
+        .filter(cell -> cell.getId().equals(cellId))
+        .map(Cell::getName)
+        .findFirst()
+        .orElse("존재하지 않는 셀");
+
+    model.addAttribute("attendances", attendances);
+    model.addAttribute("presentCount", presentCount);
+    model.addAttribute("selectedCellName", selectedCellName);
+    model.addAttribute("selectedDate", date.toString());
+
+    return "attendance_records";
   }
 
 }
