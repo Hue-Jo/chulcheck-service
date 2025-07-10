@@ -39,7 +39,7 @@ public class AttendanceController {
       attendanceStatusMap.put(cell.getId(), submitted);
     }
 
-    boolean isSunday = today.getDayOfWeek() == DayOfWeek.WEDNESDAY;
+    boolean isSunday = today.getDayOfWeek() == DayOfWeek.THURSDAY;
 
     model.addAttribute("cells", cells);
     model.addAttribute("attendanceStatusMap", attendanceStatusMap); // 출석 여부 map
@@ -65,18 +65,17 @@ public class AttendanceController {
   @PostMapping("/attendance/submit")
   public String submitAttendanceForm(
       @RequestParam Long cellId,
-      @RequestParam String date,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       HttpServletRequest request,
       RedirectAttributes redirectAttributes
   ) {
-    LocalDate attendanceDate = LocalDate.parse(date);
 
-    if (attendanceService.alreadySubmitted(cellId, attendanceDate)) {
+    if (attendanceService.alreadySubmitted(cellId, date)) {
       redirectAttributes.addFlashAttribute("error", "⚠️ 변동사항은 부장님께 연락주세요.");
       return "redirect:/";
     }
 
-    attendanceService.saveAttendance(request, cellId, attendanceDate);
+    attendanceService.saveAttendance(request, cellId, date);
     redirectAttributes.addFlashAttribute("success", "✅ 성공적으로 제출되었습니다.");
     return "redirect:/";
   }
