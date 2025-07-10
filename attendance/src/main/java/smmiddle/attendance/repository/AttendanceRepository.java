@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import smmiddle.attendance.constant.AttendanceStatus;
 import smmiddle.attendance.entity.Attendance;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
@@ -16,6 +17,5 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
   @Query("SELECT DISTINCT a.date FROM Attendance a ORDER BY a.date DESC")
   List<LocalDate> findDistinctDates();
 
-
-  List<Attendance> findByDate(LocalDate date);
+  int countByStudent_Cell_IdAndDateAndStatus(Long cellId, LocalDate date, AttendanceStatus attendanceStatus);
 }

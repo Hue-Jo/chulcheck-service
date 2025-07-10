@@ -56,6 +56,13 @@ public class AttendanceService {
   }
 
   /**
+   * 오늘 특정 셀의 출석 학생 수 반환
+   */
+  public int getTodayPresentCount(Long cellId, LocalDate date) {
+    return attendanceRepository.countByStudent_Cell_IdAndDateAndStatus(cellId, date, AttendanceStatus.PRESENT);
+  }
+
+  /**
    * 출석 정보 저장
    */
   @Transactional

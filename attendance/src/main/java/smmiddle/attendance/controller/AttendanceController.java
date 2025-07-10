@@ -34,9 +34,18 @@ public class AttendanceController {
     LocalDate today = LocalDate.now();
 
     Map<Long, Boolean> attendanceStatusMap = new HashMap<>();
+
+    boolean allSubmitted = true;
+    int todayPresentCount = 0;
+
     for (Cell cell : cells) {
       boolean submitted = attendanceService.alreadySubmitted(cell.getId(), today);
       attendanceStatusMap.put(cell.getId(), submitted);
+      if (!submitted) {
+        allSubmitted = false;
+      } else {
+        todayPresentCount += attendanceService.getTodayPresentCount(cell.getId(), today);
+      }
     }
 
     boolean isSunday = today.getDayOfWeek() == DayOfWeek.THURSDAY;
@@ -45,6 +54,8 @@ public class AttendanceController {
     model.addAttribute("attendanceStatusMap", attendanceStatusMap); // 출석 여부 map
     model.addAttribute("today", today);
     model.addAttribute("isSunday", isSunday);
+    model.addAttribute("allSubmitted", allSubmitted);
+    model.addAttribute("todayPresentCount", todayPresentCount);
     return "select_cell";
   }
 
