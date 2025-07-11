@@ -3,6 +3,7 @@ package smmiddle.attendance.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import smmiddle.attendance.constant.AttendanceStatus;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
+import smmiddle.attendance.repository.AttendanceRepository;
 import smmiddle.attendance.service.AttendanceService;
 
 @Controller
@@ -25,6 +27,7 @@ import smmiddle.attendance.service.AttendanceService;
 public class AttendanceController {
 
   private final AttendanceService attendanceService;
+  private final AttendanceRepository attendanceRepository;
 
   // 첫 화면에서 셀 목록 조회
   @GetMapping("/")
@@ -48,7 +51,7 @@ public class AttendanceController {
       }
     }
 
-    boolean isSunday = today.getDayOfWeek() == DayOfWeek.THURSDAY;
+    boolean isSunday = today.getDayOfWeek() == DayOfWeek.FRIDAY;
 
     model.addAttribute("cells", cells);
     model.addAttribute("attendanceStatusMap", attendanceStatusMap); // 출석 여부 map
@@ -69,6 +72,8 @@ public class AttendanceController {
     model.addAttribute("cell", cell);
     model.addAttribute("students", students);
     model.addAttribute("today", LocalDate.now());
+    model.addAttribute("attendanceMap", Collections.emptyMap());
+
     return "attendance_form";
   }
 
@@ -81,14 +86,31 @@ public class AttendanceController {
       RedirectAttributes redirectAttributes
   ) {
 
-    if (attendanceService.alreadySubmitted(cellId, date)) {
-      redirectAttributes.addFlashAttribute("error", "⚠️ 변동사항은 부장님께 연락주세요.");
-      return "redirect:/";
-    }
+    boolean exists = attendanceRepository.existsByStudent_Cell_IdAndDate(cellId, date);
 
-    attendanceService.saveAttendance(request, cellId, date);
-    redirectAttributes.addFlashAttribute("success", "✅ 성공적으로 제출되었습니다.");
+    if (exists) {
+      attendanceService.updateAttendance(request, cellId, date);
+      redirectAttributes.addFlashAttribute("success", "✅ 출석 정보가 수정되었습니다.");
+      return "redirect:/";
+    } else {
+      attendanceService.saveAttendance(request, cellId, date);
+      redirectAttributes.addFlashAttribute("success", "✅ 성공적으로 제출되었습니다.");
+    }
     return "redirect:/";
+  }
+
+  @GetMapping("/attendance/edit")
+  public String showEditAttendanceForm(@RequestParam Long cellId, Model model) {
+    Cell cell = attendanceService.getCellById(cellId);
+    List<Student> students = attendanceService.getAllStudentsByCellId(cellId);
+    Map<Long, Attendance> existingAttendanceMap = attendanceService.getAttendanceMap(cellId, LocalDate.now());
+
+    model.addAttribute("cell", cell);
+    model.addAttribute("students", students);
+    model.addAttribute("today", LocalDate.now());
+    model.addAttribute("attendanceMap", existingAttendanceMap);
+    model.addAttribute("isEdit", true); // 수정 여부 표시
+    return "attendance_form";
   }
 
   @GetMapping("/attendance/records")

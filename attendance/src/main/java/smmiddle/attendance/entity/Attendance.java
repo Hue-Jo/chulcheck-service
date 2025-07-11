@@ -36,4 +36,8 @@ public class Attendance {
   private Student student;
 
 
+  public void updateStatus(AttendanceStatus status, String reason) {
+    this.status = status;
+    this.reason = (status == AttendanceStatus.ABSENT) ? reason : null;
+  }
 }

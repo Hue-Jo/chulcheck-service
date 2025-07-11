@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import smmiddle.attendance.constant.AttendanceStatus;
-import smmiddle.attendance.dto.AttendanceResponse;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
@@ -59,7 +58,8 @@ public class AttendanceService {
    * 오늘 특정 셀의 출석 학생 수 반환
    */
   public int getTodayPresentCount(Long cellId, LocalDate date) {
-    return attendanceRepository.countByStudent_Cell_IdAndDateAndStatus(cellId, date, AttendanceStatus.PRESENT);
+    return attendanceRepository.countByStudent_Cell_IdAndDateAndStatus(cellId, date,
+        AttendanceStatus.PRESENT);
   }
 
   /**
@@ -86,14 +86,38 @@ public class AttendanceService {
     attendanceRepository.saveAll(attendances);
   }
 
+  /**
+   * 출석 정보 업데이트
+   */
+  @Transactional
+  public void updateAttendance(HttpServletRequest request, Long cellId, LocalDate date) {
+    List<Student> students = studentRepository.findByCell_Id(cellId);
 
-  public List<LocalDate> getAllAttendanceDates() {
-    return  attendanceRepository.findDistinctDates();
+    for (Student student : students) {
+      String statusParam = request.getParameter("status_" + student.getId());
+      String reasonParam = request.getParameter("reason_" + student.getId());
+
+      Attendance attendance = attendanceRepository.findByStudent_IdAndDate(student.getId(), date)
+          .orElseThrow(() -> new RuntimeException("출석 정보 없음"));
+
+      attendance.updateStatus(AttendanceStatus.valueOf(statusParam), reasonParam);
+    }
   }
 
-  // 셀 ID + 날짜로 출석 정보 가져오기
-  public List<Attendance> getAttendancesByCellIdAndDate(Long cellId, LocalDate date) {
-    return attendanceRepository.findByStudent_Cell_IdAndDate(cellId, date);
-  }
+    public List<LocalDate> getAllAttendanceDates () {
+      return attendanceRepository.findDistinctDates();
+    }
 
-}
+    // 셀 ID + 날짜로 출석 정보 가져오기
+    public List<Attendance> getAttendancesByCellIdAndDate (Long cellId, LocalDate date){
+      return attendanceRepository.findByStudent_Cell_IdAndDate(cellId, date);
+    }
+
+    public Map<Long, Attendance> getAttendanceMap (Long cellId, LocalDate date){
+      List<Attendance> attendances = getAttendancesByCellIdAndDate(cellId, date);
+      return attendances.stream()
+          .collect(Collectors.toMap(attendance -> attendance.getStudent().getId(),
+              attendance -> attendance));
+    }
+
+  }
