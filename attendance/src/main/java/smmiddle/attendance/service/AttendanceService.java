@@ -3,13 +3,16 @@ package smmiddle.attendance.service;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import smmiddle.attendance.constant.AttendanceStatus;
+import smmiddle.attendance.dto.AttendanceSummaryDto;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
@@ -41,6 +44,15 @@ public class AttendanceService {
   }
 
   /**
+   * cellId로 셀 이름 조회
+   */
+  public String getCellNameById(Long cellId) {
+    return cellRepository.findById(cellId)
+        .map(Cell::getName)
+        .orElse("존재하지 않는 셀");
+  }
+
+  /**
    * 셀별 학생들 조회
    */
   public List<Student> getAllStudentsByCellId(Long cellId) {
@@ -60,6 +72,35 @@ public class AttendanceService {
   public int getTodayPresentCount(Long cellId, LocalDate date) {
     return attendanceRepository.countByStudent_Cell_IdAndDateAndStatus(cellId, date,
         AttendanceStatus.PRESENT);
+  }
+
+  /**
+   * 가장 최근 출첵한 셀
+   */
+  public Optional<Attendance> getLatestAttendance() {
+    return attendanceRepository.findTopByUpdatedDateIsNotNullOrderByUpdatedDateDesc();
+  }
+
+  /**
+   * 셀별 출석 요약정보
+   */
+  public AttendanceSummaryDto getAttendanceSummary(LocalDate today) {
+    List<Cell> cells = getAllCells();
+    Map<Long, Boolean> attendanceStatusMap = new HashMap<>();
+    boolean allSubmitted = true;
+    int todayPresentCount = 0;
+
+    for (Cell cell : cells) {
+      boolean submitted = alreadySubmitted(cell.getId(), today);
+      attendanceStatusMap.put(cell.getId(), submitted);
+      if (!submitted) {
+        allSubmitted = false;
+      } else {
+        todayPresentCount += getTodayPresentCount(cell.getId(), today);
+      }
+    }
+
+    return new AttendanceSummaryDto(attendanceStatusMap, allSubmitted, todayPresentCount);
   }
 
   /**

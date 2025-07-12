@@ -21,4 +21,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
   List<LocalDate> findDistinctDates();
 
   int countByStudent_Cell_IdAndDateAndStatus(Long cellId, LocalDate date, AttendanceStatus attendanceStatus);
+
+  Optional<Attendance> findTopByUpdatedDateIsNotNullOrderByUpdatedDateDesc();
 }

@@ -3,10 +3,12 @@ package smmiddle.attendance.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import smmiddle.attendance.constant.AttendanceStatus;
+import smmiddle.attendance.dto.AttendanceSummaryDto;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
@@ -35,37 +38,29 @@ public class AttendanceController {
 
     List<Cell> cells = attendanceService.getAllCells();
     LocalDate today = LocalDate.now();
+    AttendanceSummaryDto summary = attendanceService.getAttendanceSummary(today);
 
-    Map<Long, Boolean> attendanceStatusMap = new HashMap<>();
+    // 마지막 수정된 출석 가져오기
+    Optional<Attendance> latest = attendanceService.getLatestAttendance();
+    latest.ifPresent(att -> {
+      model.addAttribute("lastUpdatedTime", att.getUpdatedDate());
+      model.addAttribute("lastUpdatedCellName", att.getStudent().getCell().getName());
+    });
 
-    boolean allSubmitted = true;
-    int todayPresentCount = 0;
-
-    for (Cell cell : cells) {
-      boolean submitted = attendanceService.alreadySubmitted(cell.getId(), today);
-      attendanceStatusMap.put(cell.getId(), submitted);
-      if (!submitted) {
-        allSubmitted = false;
-      } else {
-        todayPresentCount += attendanceService.getTodayPresentCount(cell.getId(), today);
-      }
-    }
-
-    boolean isSunday = today.getDayOfWeek() == DayOfWeek.FRIDAY;
+    boolean isSunday = today.getDayOfWeek() == DayOfWeek.SATURDAY; // 일요일만
 
     model.addAttribute("cells", cells);
-    model.addAttribute("attendanceStatusMap", attendanceStatusMap); // 출석 여부 map
     model.addAttribute("today", today);
     model.addAttribute("isSunday", isSunday);
-    model.addAttribute("allSubmitted", allSubmitted);
-    model.addAttribute("todayPresentCount", todayPresentCount);
+    model.addAttribute("attendanceStatusMap", summary.getAttendanceStatusMap()); // 출석 여부 map
+    model.addAttribute("allSubmitted", summary.isAllSubmitted());
+    model.addAttribute("todayPresentCount", summary.getTodayPresentCount());
     return "select_cell";
   }
 
   // 선택한 셀의 출석체크 폼으로 이동
   @GetMapping("/attendance/form")
-  public String showAttendanceForm(
-      @RequestParam Long cellId, Model model) {
+  public String showAttendanceForm(@RequestParam Long cellId, Model model) {
     Cell cell = attendanceService.getCellById(cellId);
     List<Student> students = attendanceService.getAllStudentsByCellId(cellId);
 
@@ -77,7 +72,7 @@ public class AttendanceController {
     return "attendance_form";
   }
 
-  // 출첵 폼에서 제출된 데이터를 받아 출석 정보 저장후 성공 페이지로 리다이렉트
+  // 출석폼 제출 -> 첫 페이지로 리다이렉트
   @PostMapping("/attendance/submit")
   public String submitAttendanceForm(
       @RequestParam Long cellId,
@@ -91,7 +86,6 @@ public class AttendanceController {
     if (exists) {
       attendanceService.updateAttendance(request, cellId, date);
       redirectAttributes.addFlashAttribute("success", "✅ 출석 정보가 수정되었습니다.");
-      return "redirect:/";
     } else {
       attendanceService.saveAttendance(request, cellId, date);
       redirectAttributes.addFlashAttribute("success", "✅ 성공적으로 제출되었습니다.");
@@ -107,7 +101,7 @@ public class AttendanceController {
 
     model.addAttribute("cell", cell);
     model.addAttribute("students", students);
-    model.addAttribute("today", LocalDate.now());
+    model.addAttribute("today", LocalDateTime.now());
     model.addAttribute("attendanceMap", existingAttendanceMap);
     model.addAttribute("isEdit", true); // 수정 여부 표시
     return "attendance_form";
@@ -139,11 +133,7 @@ public class AttendanceController {
         .count();
 
     // 셀 이름 (선택한 셀 ID로 조회)
-    String selectedCellName = cells.stream()
-        .filter(cell -> cell.getId().equals(cellId))
-        .map(Cell::getName)
-        .findFirst()
-        .orElse("존재하지 않는 셀");
+    String selectedCellName = attendanceService.getCellNameById(cellId);
 
     model.addAttribute("attendances", attendances);
     model.addAttribute("presentCount", presentCount);
