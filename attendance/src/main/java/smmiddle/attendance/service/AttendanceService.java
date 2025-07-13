@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import smmiddle.attendance.constant.AbsenceReason;
 import smmiddle.attendance.constant.AttendanceStatus;
 import smmiddle.attendance.dto.AttendanceSummaryDto;
 import smmiddle.attendance.entity.Attendance;
@@ -113,17 +114,34 @@ public class AttendanceService {
 
     for (Student student : students) {
       String statusParam = request.getParameter("status_" + student.getId());
-      String reasonParam = request.getParameter("reason_" + student.getId());
+      String absenceReasonParam = request.getParameter("absenceReason_" + student.getId());
+      String customReasonParam = request.getParameter("customReason_" + student.getId());
 
       AttendanceStatus status = AttendanceStatus.valueOf(statusParam);
+      AbsenceReason absenceReason = null;
+      String customReason = null;
+
+      if (status == AttendanceStatus.ABSENT) {
+        if (absenceReasonParam == null || absenceReasonParam.isEmpty()) {
+          throw new IllegalArgumentException("결석 사유는 반드시 입력해야 합니다.");
+        }
+        absenceReason = AbsenceReason.valueOf(absenceReasonParam);
+        if (absenceReason == AbsenceReason.OTHER) {
+          customReason = customReasonParam;
+        }
+      }
+
       Attendance attendance = Attendance.builder()
           .student(student)
           .date(date)
           .status(status)
-          .reason(status == AttendanceStatus.ABSENT ? reasonParam : null)
+          .absenceReason(absenceReason)
+          .customReason(customReason)
           .build();
+
       attendances.add(attendance);
     }
+
     attendanceRepository.saveAll(attendances);
   }
 
@@ -136,12 +154,27 @@ public class AttendanceService {
 
     for (Student student : students) {
       String statusParam = request.getParameter("status_" + student.getId());
-      String reasonParam = request.getParameter("reason_" + student.getId());
+      String absenceReasonParam = request.getParameter("absenceReason_" + student.getId());
+      String customReasonParam = request.getParameter("customReason_" + student.getId());
+
+      AttendanceStatus status = AttendanceStatus.valueOf(statusParam);
+      AbsenceReason absenceReason = null;
+      String customReason = null;
+
+      if (status == AttendanceStatus.ABSENT) {
+        if (absenceReasonParam == null || absenceReasonParam.isEmpty()) {
+          throw new IllegalArgumentException("결석 사유는 반드시 입력해야 합니다.");
+        }
+        absenceReason = AbsenceReason.valueOf(absenceReasonParam);
+        if (absenceReason == AbsenceReason.OTHER) {
+          customReason = customReasonParam;
+        }
+      }
 
       Attendance attendance = attendanceRepository.findByStudent_IdAndDate(student.getId(), date)
           .orElseThrow(() -> new RuntimeException("출석 정보 없음"));
 
-      attendance.updateStatus(AttendanceStatus.valueOf(statusParam), reasonParam);
+      attendance.updateStatus(status, absenceReason, customReason);
     }
   }
 

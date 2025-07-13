@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import smmiddle.attendance.constant.AbsenceReason;
 import smmiddle.attendance.constant.AttendanceStatus;
 import smmiddle.attendance.dto.AttendanceSummaryDto;
 import smmiddle.attendance.entity.Attendance;
@@ -58,7 +59,7 @@ public class AttendanceController {
     return "select_cell";
   }
 
-  // 선택한 셀의 출석체크 폼으로 이동
+  // 선택한 셀의 출석체크 폼
   @GetMapping("/attendance/form")
   public String showAttendanceForm(@RequestParam Long cellId, Model model) {
     Cell cell = attendanceService.getCellById(cellId);
@@ -67,6 +68,7 @@ public class AttendanceController {
     model.addAttribute("cell", cell);
     model.addAttribute("students", students);
     model.addAttribute("today", LocalDate.now());
+    model.addAttribute("absenceReasons", AbsenceReason.values());
     model.addAttribute("attendanceMap", Collections.emptyMap());
 
     return "attendance_form";
