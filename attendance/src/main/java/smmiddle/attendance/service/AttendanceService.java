@@ -57,7 +57,7 @@ public class AttendanceService {
    * 셀별 학생들 조회
    */
   public List<Student> getAllStudentsByCellId(Long cellId) {
-    return studentRepository.findByCell_Id(cellId);
+    return studentRepository.findByCell_IdOrderByNameAsc(cellId);
   }
 
   /**
@@ -109,7 +109,7 @@ public class AttendanceService {
    */
   @Transactional
   public void saveAttendance(HttpServletRequest request, Long cellId, LocalDate date) {
-    List<Student> students = studentRepository.findByCell_Id(cellId);
+    List<Student> students = studentRepository.findByCell_IdOrderByNameAsc(cellId);
     List<Attendance> attendances = new ArrayList<>();
 
     for (Student student : students) {
@@ -150,7 +150,7 @@ public class AttendanceService {
    */
   @Transactional
   public void updateAttendance(HttpServletRequest request, Long cellId, LocalDate date) {
-    List<Student> students = studentRepository.findByCell_Id(cellId);
+    List<Student> students = studentRepository.findByCell_IdOrderByNameAsc(cellId);
 
     for (Student student : students) {
       String statusParam = request.getParameter("status_" + student.getId());
