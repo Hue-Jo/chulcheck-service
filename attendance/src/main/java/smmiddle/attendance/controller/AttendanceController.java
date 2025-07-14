@@ -1,11 +1,11 @@
 package smmiddle.attendance.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +35,12 @@ public class AttendanceController {
 
   // 첫 화면에서 셀 목록 조회
   @GetMapping("/")
-  public String showCellSelectForm(Model model) {
+  public String showCellSelectForm(HttpSession session, Model model) {
+
+    Boolean authenticated = (Boolean) session.getAttribute("authenticated");
+    if (authenticated == null || !authenticated) {
+      return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
+    }
 
     List<Cell> cells = attendanceService.getAllCells();
     LocalDate today = LocalDate.now();
@@ -48,7 +53,7 @@ public class AttendanceController {
       model.addAttribute("lastUpdatedCellName", att.getStudent().getCell().getName());
     });
 
-    boolean isSunday = today.getDayOfWeek() == DayOfWeek.SATURDAY; // 일요일만
+    boolean isSunday = today.getDayOfWeek() == DayOfWeek.SUNDAY; // 일요일만
 
     model.addAttribute("cells", cells);
     model.addAttribute("today", today);
