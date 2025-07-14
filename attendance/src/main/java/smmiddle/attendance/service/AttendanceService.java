@@ -178,20 +178,34 @@ public class AttendanceService {
     }
   }
 
-    public List<LocalDate> getAllAttendanceDates () {
-      return attendanceRepository.findDistinctDates();
+  /**
+   * 출석정보 저장/수정
+   */
+  @Transactional
+  public String submitAttendance(HttpServletRequest request, Long cellId, LocalDate date) {
+    if (alreadySubmitted(cellId, date)) {
+      updateAttendance(request, cellId, date);
+      return "수정";
+    } else {
+      saveAttendance(request, cellId, date);
+      return "제출";
     }
-
-    // 셀 ID + 날짜로 출석 정보 가져오기
-    public List<Attendance> getAttendancesByCellIdAndDate (Long cellId, LocalDate date){
-      return attendanceRepository.findByStudent_Cell_IdAndDate(cellId, date);
-    }
-
-    public Map<Long, Attendance> getAttendanceMap (Long cellId, LocalDate date){
-      List<Attendance> attendances = getAttendancesByCellIdAndDate(cellId, date);
-      return attendances.stream()
-          .collect(Collectors.toMap(attendance -> attendance.getStudent().getId(),
-              attendance -> attendance));
-    }
-
   }
+
+  public List<LocalDate> getAllAttendanceDates() {
+    return attendanceRepository.findDistinctDates();
+  }
+
+  // 셀 ID + 날짜로 출석 정보 가져오기
+  public List<Attendance> getAttendancesByCellIdAndDate(Long cellId, LocalDate date) {
+    return attendanceRepository.findByStudent_Cell_IdAndDate(cellId, date);
+  }
+
+  public Map<Long, Attendance> getAttendanceMap(Long cellId, LocalDate date) {
+    List<Attendance> attendances = getAttendancesByCellIdAndDate(cellId, date);
+    return attendances.stream()
+        .collect(Collectors.toMap(attendance -> attendance.getStudent().getId(),
+            attendance -> attendance));
+  }
+
+}

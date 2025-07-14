@@ -44,6 +44,8 @@ public class AttendanceController {
 
     List<Cell> cells = attendanceService.getAllCells();
     LocalDate today = LocalDate.now();
+    boolean isSunday = today.getDayOfWeek() == DayOfWeek.TUESDAY; // 일요일만
+
     AttendanceSummaryDto summary = attendanceService.getAttendanceSummary(today);
 
     // 마지막 수정된 출석 가져오기
@@ -52,8 +54,6 @@ public class AttendanceController {
       model.addAttribute("lastUpdatedTime", att.getUpdatedDate());
       model.addAttribute("lastUpdatedCellName", att.getStudent().getCell().getName());
     });
-
-    boolean isSunday = today.getDayOfWeek() == DayOfWeek.SUNDAY; // 일요일만
 
     model.addAttribute("cells", cells);
     model.addAttribute("today", today);
@@ -87,16 +87,8 @@ public class AttendanceController {
       HttpServletRequest request,
       RedirectAttributes redirectAttributes
   ) {
-
-    boolean exists = attendanceRepository.existsByStudent_Cell_IdAndDate(cellId, date);
-
-    if (exists) {
-      attendanceService.updateAttendance(request, cellId, date);
-      redirectAttributes.addFlashAttribute("success", "✅ 출석 정보가 수정되었습니다.");
-    } else {
-      attendanceService.saveAttendance(request, cellId, date);
-      redirectAttributes.addFlashAttribute("success", "✅ 성공적으로 제출되었습니다.");
-    }
+    String result = attendanceService.submitAttendance(request, cellId, date);
+    redirectAttributes.addFlashAttribute("success", "✅ 출석 정보가 " + result + "되었습니다.");
     return "redirect:/";
   }
 
