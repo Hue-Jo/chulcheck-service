@@ -31,7 +31,6 @@ import smmiddle.attendance.service.AttendanceService;
 public class AttendanceController {
 
   private final AttendanceService attendanceService;
-  private final AttendanceRepository attendanceRepository;
 
   // 첫 화면에서 셀 목록 조회
   @GetMapping("/")
@@ -66,7 +65,15 @@ public class AttendanceController {
 
   // 선택한 셀의 출석체크 폼
   @GetMapping("/attendance/form")
-  public String showAttendanceForm(@RequestParam Long cellId, Model model) {
+  public String showAttendanceForm(
+      HttpSession session,
+      @RequestParam Long cellId, Model model) {
+
+    Boolean authenticated = (Boolean) session.getAttribute("authenticated");
+    if (authenticated == null || !authenticated) {
+      return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
+    }
+
     Cell cell = attendanceService.getCellById(cellId);
     List<Student> students = attendanceService.getAllStudentsByCellId(cellId);
 
@@ -93,7 +100,15 @@ public class AttendanceController {
   }
 
   @GetMapping("/attendance/edit")
-  public String showEditAttendanceForm(@RequestParam Long cellId, Model model) {
+  public String showEditAttendanceForm(
+      HttpSession session,
+      @RequestParam Long cellId, Model model) {
+
+    Boolean authenticated = (Boolean) session.getAttribute("authenticated");
+    if (authenticated == null || !authenticated) {
+      return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
+    }
+
     Cell cell = attendanceService.getCellById(cellId);
     List<Student> students = attendanceService.getAllStudentsByCellId(cellId);
     Map<Long, Attendance> existingAttendanceMap = attendanceService.getAttendanceMap(cellId, LocalDate.now());
@@ -108,9 +123,15 @@ public class AttendanceController {
 
   @GetMapping("/attendance/records")
   public String viewAttendanceRecords(
+      HttpSession session,
       @RequestParam(name = "cellId", required = false) Long cellId,
       @RequestParam(name = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
       Model model) {
+
+    Boolean authenticated = (Boolean) session.getAttribute("authenticated");
+    if (authenticated == null || !authenticated) {
+      return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
+    }
 
     // 셀 목록 전달 (셀 선택용 드롭다운)
     List<Cell> cells = attendanceService.getAllCells();
