@@ -23,7 +23,6 @@ import smmiddle.attendance.dto.AttendanceSummaryDto;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
-import smmiddle.attendance.repository.AttendanceRepository;
 import smmiddle.attendance.service.AttendanceService;
 
 @Controller
@@ -32,24 +31,27 @@ public class AttendanceController {
 
   private final AttendanceService attendanceService;
 
+
+  private boolean isNotAuthenticated(HttpSession session) {
+    Boolean authenticated = (Boolean) session.getAttribute("authenticated");
+    return authenticated == null || !authenticated;
+  }
+
   // 첫 화면에서 셀 목록 조회
   @GetMapping("/")
   public String showCellSelectForm(HttpSession session, Model model) {
-
-    Boolean authenticated = (Boolean) session.getAttribute("authenticated");
-    if (authenticated == null || !authenticated) {
+    if (isNotAuthenticated(session)) {
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
 
     List<Cell> cells = attendanceService.getAllCells();
     LocalDate today = LocalDate.now();
-    boolean isSunday = today.getDayOfWeek() == DayOfWeek.TUESDAY; // 일요일만
+    boolean isSunday = today.getDayOfWeek() == DayOfWeek.WEDNESDAY; // 일요일만
 
     AttendanceSummaryDto summary = attendanceService.getAttendanceSummary(today);
 
     // 마지막 수정된 출석 가져오기
-    Optional<Attendance> latest = attendanceService.getLatestAttendance();
-    latest.ifPresent(att -> {
+    attendanceService.getLatestAttendance().ifPresent(att -> {
       model.addAttribute("lastUpdatedTime", att.getUpdatedDate());
       model.addAttribute("lastUpdatedCellName", att.getStudent().getCell().getName());
     });
@@ -69,8 +71,7 @@ public class AttendanceController {
       HttpSession session,
       @RequestParam Long cellId, Model model) {
 
-    Boolean authenticated = (Boolean) session.getAttribute("authenticated");
-    if (authenticated == null || !authenticated) {
+    if (isNotAuthenticated(session)) {
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
 
@@ -104,8 +105,7 @@ public class AttendanceController {
       HttpSession session,
       @RequestParam Long cellId, Model model) {
 
-    Boolean authenticated = (Boolean) session.getAttribute("authenticated");
-    if (authenticated == null || !authenticated) {
+    if (isNotAuthenticated(session)) {
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
 
@@ -128,8 +128,7 @@ public class AttendanceController {
       @RequestParam(name = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
       Model model) {
 
-    Boolean authenticated = (Boolean) session.getAttribute("authenticated");
-    if (authenticated == null || !authenticated) {
+    if (isNotAuthenticated(session)) {
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
 
@@ -147,9 +146,13 @@ public class AttendanceController {
     }
 
     // 출석 기록 조회
+
     List<Attendance> attendances = attendanceService.getAttendancesByCellIdAndDate(cellId, date);
-    long presentCount = attendances.stream()
-        .filter(att -> att.getStatus() == AttendanceStatus.PRESENT)
+    int presentCount = (int) attendances.stream()
+        .filter(att -> att.getStatus() == AttendanceStatus.PRESENT
+            || (att.getStatus() == AttendanceStatus.ABSENT
+            && (att.getAbsenceReason() == AbsenceReason.NAVE
+            || att.getAbsenceReason() == AbsenceReason.OTHER_CHURCH)))
         .count();
 
     // 셀 이름 (선택한 셀 ID로 조회)

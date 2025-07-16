@@ -2,7 +2,6 @@ package smmiddle.attendance.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,8 +70,14 @@ public class AttendanceService {
    * 오늘 특정 셀의 출석 학생 수 반환
    */
   public int getTodayPresentCount(Long cellId, LocalDate date) {
-    return attendanceRepository.countByStudent_Cell_IdAndDateAndStatus(cellId, date,
-        AttendanceStatus.PRESENT);
+    List<Attendance> attendances = attendanceRepository.findByStudent_Cell_IdAndDate(cellId, date);
+
+    return (int) attendances.stream()
+        .filter(att -> att.getStatus() == AttendanceStatus.PRESENT ||
+            (att.getStatus() == AttendanceStatus.ABSENT &&
+                (att.getAbsenceReason() == AbsenceReason.NAVE ||
+                 att.getAbsenceReason() == AbsenceReason.OTHER_CHURCH)))
+        .count();
   }
 
   /**
@@ -105,91 +110,52 @@ public class AttendanceService {
   }
 
   /**
-   * 출석 정보 저장
-   */
-  @Transactional
-  public void saveAttendance(HttpServletRequest request, Long cellId, LocalDate date) {
-    List<Student> students = studentRepository.findByCell_IdOrderByNameAsc(cellId);
-    List<Attendance> attendances = new ArrayList<>();
-
-    for (Student student : students) {
-      String statusParam = request.getParameter("status_" + student.getId());
-      String absenceReasonParam = request.getParameter("absenceReason_" + student.getId());
-      String customReasonParam = request.getParameter("customReason_" + student.getId());
-
-      AttendanceStatus status = AttendanceStatus.valueOf(statusParam);
-      AbsenceReason absenceReason = null;
-      String customReason = null;
-
-      if (status == AttendanceStatus.ABSENT) {
-        if (absenceReasonParam == null || absenceReasonParam.isEmpty()) {
-          throw new IllegalArgumentException("결석 사유는 반드시 입력해야 합니다.");
-        }
-        absenceReason = AbsenceReason.valueOf(absenceReasonParam);
-        if (absenceReason == AbsenceReason.OTHER) {
-          customReason = customReasonParam;
-        }
-      }
-
-      Attendance attendance = Attendance.builder()
-          .student(student)
-          .date(date)
-          .status(status)
-          .absenceReason(absenceReason)
-          .customReason(customReason)
-          .build();
-
-      attendances.add(attendance);
-    }
-
-    attendanceRepository.saveAll(attendances);
-  }
-
-  /**
-   * 출석 정보 업데이트
-   */
-  @Transactional
-  public void updateAttendance(HttpServletRequest request, Long cellId, LocalDate date) {
-    List<Student> students = studentRepository.findByCell_IdOrderByNameAsc(cellId);
-
-    for (Student student : students) {
-      String statusParam = request.getParameter("status_" + student.getId());
-      String absenceReasonParam = request.getParameter("absenceReason_" + student.getId());
-      String customReasonParam = request.getParameter("customReason_" + student.getId());
-
-      AttendanceStatus status = AttendanceStatus.valueOf(statusParam);
-      AbsenceReason absenceReason = null;
-      String customReason = null;
-
-      if (status == AttendanceStatus.ABSENT) {
-        if (absenceReasonParam == null || absenceReasonParam.isEmpty()) {
-          throw new IllegalArgumentException("결석 사유는 반드시 입력해야 합니다.");
-        }
-        absenceReason = AbsenceReason.valueOf(absenceReasonParam);
-        if (absenceReason == AbsenceReason.OTHER) {
-          customReason = customReasonParam;
-        }
-      }
-
-      Attendance attendance = attendanceRepository.findByStudent_IdAndDate(student.getId(), date)
-          .orElseThrow(() -> new RuntimeException("출석 정보 없음"));
-
-      attendance.updateStatus(status, absenceReason, customReason);
-    }
-  }
-
-  /**
-   * 출석정보 저장/수정
+   * 출석정보 제출/수정
    */
   @Transactional
   public String submitAttendance(HttpServletRequest request, Long cellId, LocalDate date) {
-    if (alreadySubmitted(cellId, date)) {
-      updateAttendance(request, cellId, date);
-      return "수정";
-    } else {
-      saveAttendance(request, cellId, date);
-      return "제출";
+    boolean hasExisting = false;
+
+    List<Student> students = studentRepository.findByCell_IdOrderByNameAsc(cellId);
+
+    for (Student student : students) {
+      String statusParam = request.getParameter("status_" + student.getId());
+      String absenceReasonParam = request.getParameter("absenceReason_" + student.getId());
+      String customReasonParam = request.getParameter("customReason_" + student.getId());
+
+      AttendanceStatus status = AttendanceStatus.valueOf(statusParam);
+      AbsenceReason absenceReason = null;
+      String customReason = null;
+
+      if (status == AttendanceStatus.ABSENT) {
+        if (absenceReasonParam == null || absenceReasonParam.isEmpty()) {
+          throw new IllegalArgumentException("결석 사유는 반드시 입력해야 합니다.");
+        }
+        absenceReason = AbsenceReason.valueOf(absenceReasonParam);
+        if (absenceReason == AbsenceReason.OTHER) {
+          customReason = customReasonParam;
+        }
+      }
+
+      Optional<Attendance> attendanceOpt = attendanceRepository.findByStudent_IdAndDate(student.getId(), date);
+
+      if (attendanceOpt.isPresent()) {
+        attendanceOpt.get().updateStatus(status, absenceReason, customReason);
+        hasExisting = true;
+      } else {
+        Attendance attendance = Attendance.builder()
+            .student(student)
+            .date(date)
+            .status(status)
+            .absenceReason(absenceReason)
+            .customReason(customReason)
+            .build();
+
+        attendanceRepository.save(attendance);
+      }
     }
+
+    return hasExisting ? "수정" : "제출";
   }
 
   public List<LocalDate> getAllAttendanceDates() {
@@ -204,7 +170,8 @@ public class AttendanceService {
   public Map<Long, Attendance> getAttendanceMap(Long cellId, LocalDate date) {
     List<Attendance> attendances = getAttendancesByCellIdAndDate(cellId, date);
     return attendances.stream()
-        .collect(Collectors.toMap(attendance -> attendance.getStudent().getId(),
+        .collect(Collectors.toMap(
+            attendance -> attendance.getStudent().getId(),
             attendance -> attendance));
   }
 
