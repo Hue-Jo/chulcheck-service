@@ -12,7 +12,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
   boolean existsByStudent_Cell_IdAndDate(Long cellId, LocalDate date);
 
-  List<Attendance> findByStudent_Cell_IdAndDate(Long cellId, LocalDate date);
+  List<Attendance> findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(Long cellId, LocalDate date);
 
   Optional<Attendance> findByStudent_IdAndDate(Long studentId, LocalDate date);
 

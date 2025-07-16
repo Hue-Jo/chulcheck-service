@@ -70,7 +70,7 @@ public class AttendanceService {
    * 오늘 특정 셀의 출석 학생 수 반환
    */
   public int getTodayPresentCount(Long cellId, LocalDate date) {
-    List<Attendance> attendances = attendanceRepository.findByStudent_Cell_IdAndDate(cellId, date);
+    List<Attendance> attendances = attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
 
     return (int) attendances.stream()
         .filter(att -> att.getStatus() == AttendanceStatus.PRESENT ||
@@ -164,7 +164,7 @@ public class AttendanceService {
 
   // 셀 ID + 날짜로 출석 정보 가져오기
   public List<Attendance> getAttendancesByCellIdAndDate(Long cellId, LocalDate date) {
-    return attendanceRepository.findByStudent_Cell_IdAndDate(cellId, date);
+    return attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
   }
 
   public Map<Long, Attendance> getAttendanceMap(Long cellId, LocalDate date) {
