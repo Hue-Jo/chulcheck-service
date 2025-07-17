@@ -2,26 +2,32 @@ package smmiddle.attendance.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import smmiddle.attendance.constant.AbsenceReason;
 import smmiddle.attendance.constant.AttendanceStatus;
-import smmiddle.attendance.dto.AttendanceSummaryDto;
+import smmiddle.attendance.dto.AllAttendanceSummaryDto;
+import smmiddle.attendance.dto.CellAttendanceSummaryDto;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
+import smmiddle.attendance.exception.ChulCheckException;
+import smmiddle.attendance.exception.ErrorCode;
 import smmiddle.attendance.repository.AttendanceRepository;
 import smmiddle.attendance.repository.CellRepository;
 import smmiddle.attendance.repository.StudentRepository;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AttendanceService {
 
   private final AttendanceRepository attendanceRepository;
@@ -32,6 +38,7 @@ public class AttendanceService {
    * 모든 셀 조회
    */
   public List<Cell> getAllCells() {
+    log.debug("모든 셀 정보 조회 요청");
     return cellRepository.findAll();
   }
 
@@ -39,23 +46,50 @@ public class AttendanceService {
    * 특정 셀 조회
    */
   public Cell getCellById(Long cellId) {
+    if (cellId == null || cellId <= 0) {
+      log.warn("잘못된 셀 ID: {}", cellId);
+      throw new ChulCheckException(ErrorCode.INVALID_CELL_ID);
+    }
+
     return cellRepository.findById(cellId)
-        .orElseThrow(() -> new IllegalArgumentException("해당 셀이 존재하지 않습니다."));
+        .orElseThrow(() -> {
+          log.warn("셀 ID [{}]에 해당하는 셀이 존재하지 않습니다.", cellId);
+          return new ChulCheckException(ErrorCode.CELL_NOT_FOUND);
+        });
   }
 
   /**
    * cellId로 셀 이름 조회
    */
   public String getCellNameById(Long cellId) {
+    if (cellId == null || cellId <= 0) {
+      log.warn("잘못된 셀 ID: {}", cellId);
+      throw new ChulCheckException(ErrorCode.INVALID_CELL_ID);
+    }
+
     return cellRepository.findById(cellId)
         .map(Cell::getName)
-        .orElse("존재하지 않는 셀");
+        .orElseThrow(() -> {
+          log.warn("셀 ID [{}]에 해당하는 셀이 존재하지 않습니다.", cellId);
+          throw new ChulCheckException(ErrorCode.CELL_NOT_FOUND);
+        });
   }
 
   /**
    * 셀별 학생들 조회
    */
   public List<Student> getAllStudentsByCellId(Long cellId) {
+    if (cellId == null || cellId <= 0) {
+      log.warn("잘못된 셀 ID: {}", cellId);
+      throw new ChulCheckException(ErrorCode.INVALID_CELL_ID);
+    }
+
+    if (!cellRepository.existsById(cellId)) {
+      log.warn("셀 ID [{}]에 해당하는 셀이 존재하지 않습니다.", cellId);
+      throw new ChulCheckException(ErrorCode.CELL_NOT_FOUND);
+    }
+
+    log.debug("셀 ID [{}]에 속한 학생들 조회", cellId);
     return studentRepository.findByCell_IdOrderByNameAsc(cellId);
   }
 
@@ -72,12 +106,15 @@ public class AttendanceService {
   public int getTodayPresentCount(Long cellId, LocalDate date) {
     List<Attendance> attendances = attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
 
-    return (int) attendances.stream()
+    int count = (int) attendances.stream()
         .filter(att -> att.getStatus() == AttendanceStatus.PRESENT ||
             (att.getStatus() == AttendanceStatus.ABSENT &&
                 (att.getAbsenceReason() == AbsenceReason.NAVE ||
                  att.getAbsenceReason() == AbsenceReason.OTHER_CHURCH)))
         .count();
+
+    log.debug("셀 ID [{}], 날짜 [{}]의 출석 인원 수: {}", cellId, date, count);
+    return count;
   }
 
   /**
@@ -90,7 +127,7 @@ public class AttendanceService {
   /**
    * 셀별 출석 요약정보
    */
-  public AttendanceSummaryDto getAttendanceSummary(LocalDate today) {
+  public AllAttendanceSummaryDto getAttendanceSummary(LocalDate today) {
     List<Cell> cells = getAllCells();
     Map<Long, Boolean> attendanceStatusMap = new HashMap<>();
     boolean allSubmitted = true;
@@ -106,7 +143,7 @@ public class AttendanceService {
       }
     }
 
-    return new AttendanceSummaryDto(attendanceStatusMap, allSubmitted, todayPresentCount);
+    return new AllAttendanceSummaryDto(attendanceStatusMap, allSubmitted, todayPresentCount);
   }
 
   /**
@@ -154,7 +191,7 @@ public class AttendanceService {
         attendanceRepository.save(attendance);
       }
     }
-
+    log.info("출석 정보 {} 완료 - 셀 ID: {}, 날짜: {}", hasExisting ? "수정" : "제출", cellId, date);
     return hasExisting ? "수정" : "제출";
   }
 
@@ -164,6 +201,7 @@ public class AttendanceService {
 
   // 셀 ID + 날짜로 출석 정보 가져오기
   public List<Attendance> getAttendancesByCellIdAndDate(Long cellId, LocalDate date) {
+    log.debug("셀 ID [{}], 날짜 [{}]의 출석 정보 조회", cellId, date);
     return attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
   }
 
@@ -173,6 +211,24 @@ public class AttendanceService {
         .collect(Collectors.toMap(
             attendance -> attendance.getStudent().getId(),
             attendance -> attendance));
+  }
+
+  public List<CellAttendanceSummaryDto> getTodayCellAttendanceSummary() {
+    LocalDate today = LocalDate.now();
+    List<Cell> cells = cellRepository.findAll();
+    List<CellAttendanceSummaryDto> summaries = new ArrayList<>();
+    for (Cell cell : cells) {
+
+      boolean submitted = attendanceRepository.existsByStudent_Cell_IdAndDate(cell.getId(), today);
+
+      // 제출했으면 출석 인원 수, 아니면 "⌛"
+      String presentCountDisplay = submitted
+          ? attendanceRepository.countByStudent_Cell_IdAndDateAndStatus(cell.getId(), today, AttendanceStatus.PRESENT) + "명"
+          : "⌛";
+
+      summaries.add(new CellAttendanceSummaryDto(cell.getName(), submitted, presentCountDisplay));
+    }
+    return summaries;
   }
 
 }

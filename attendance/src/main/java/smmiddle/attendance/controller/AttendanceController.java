@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -19,7 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import smmiddle.attendance.constant.AbsenceReason;
 import smmiddle.attendance.constant.AttendanceStatus;
-import smmiddle.attendance.dto.AttendanceSummaryDto;
+import smmiddle.attendance.dto.AllAttendanceSummaryDto;
+import smmiddle.attendance.dto.CellAttendanceSummaryDto;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
@@ -46,9 +46,9 @@ public class AttendanceController {
 
     List<Cell> cells = attendanceService.getAllCells();
     LocalDate today = LocalDate.now();
-    boolean isSunday = today.getDayOfWeek() == DayOfWeek.WEDNESDAY; // 일요일만
+    boolean isSunday = today.getDayOfWeek() == DayOfWeek.FRIDAY; // 일요일만
 
-    AttendanceSummaryDto summary = attendanceService.getAttendanceSummary(today);
+    AllAttendanceSummaryDto summary = attendanceService.getAttendanceSummary(today);
 
     // 마지막 수정된 출석 가져오기
     attendanceService.getLatestAttendance().ifPresent(att -> {
@@ -140,8 +140,15 @@ public class AttendanceController {
     List<LocalDate> attendanceDates = attendanceService.getAllAttendanceDates();
     model.addAttribute("dates", attendanceDates);
 
-    // 셀이나 날짜가 선택되지 않았다면 조회 결과는 null (폼만 보여줌)
+//    // 셀이나 날짜가 선택되지 않았다면 조회 결과는 null (폼만 보여줌)
+//    if (cellId == null || cellId == 0 || date == null) {
+//      return "attendance_records";
+//    }
+
     if (cellId == null || cellId == 0 || date == null) {
+      // 날짜 또는 셀이 선택되지 않은 경우, 전체 셀 출석 요약 전달
+      List<CellAttendanceSummaryDto> summaryList = attendanceService.getTodayCellAttendanceSummary();
+      model.addAttribute("summaryList", summaryList);
       return "attendance_records";
     }
 
