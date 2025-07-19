@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import smmiddle.attendance.constant.AbsenceReason;
-import smmiddle.attendance.constant.AttendanceStatus;
 import smmiddle.attendance.dto.AllAttendanceSummaryDto;
-import smmiddle.attendance.dto.CellAttendanceSummaryDto;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
@@ -87,7 +85,8 @@ public class AttendanceController {
     return "attendance_form";
   }
 
-  // 출석폼 제출 -> 첫 페이지로 리다이렉트
+
+  // 출석폼 제출/수정
   @PostMapping("/attendance/submit")
   public String submitAttendanceForm(
       @RequestParam Long cellId,
@@ -99,6 +98,7 @@ public class AttendanceController {
     redirectAttributes.addFlashAttribute("success", "✅ 출석 정보가 " + result + "되었습니다.");
     return "redirect:/";
   }
+
 
   @GetMapping("/attendance/edit")
   public String showEditAttendanceForm(
@@ -119,58 +119,6 @@ public class AttendanceController {
     model.addAttribute("attendanceMap", existingAttendanceMap);
     model.addAttribute("isEdit", true); // 수정 여부 표시
     return "attendance_form";
-  }
-
-  @GetMapping("/attendance/records")
-  public String viewAttendanceRecords(
-      HttpSession session,
-      @RequestParam(name = "cellId", required = false) Long cellId,
-      @RequestParam(name = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-      Model model) {
-
-    if (isNotAuthenticated(session)) {
-      return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
-    }
-
-    // 셀 목록 전달 (셀 선택용 드롭다운)
-    List<Cell> cells = attendanceService.getAllCells();
-    model.addAttribute("cells", cells);
-
-    // 날짜 목록 전달 (출석 기록 있는 날짜만)
-    List<LocalDate> attendanceDates = attendanceService.getAllAttendanceDates();
-    model.addAttribute("dates", attendanceDates);
-
-//    // 셀이나 날짜가 선택되지 않았다면 조회 결과는 null (폼만 보여줌)
-//    if (cellId == null || cellId == 0 || date == null) {
-//      return "attendance_records";
-//    }
-
-    if (cellId == null || cellId == 0 || date == null) {
-      // 날짜 또는 셀이 선택되지 않은 경우, 전체 셀 출석 요약 전달
-      List<CellAttendanceSummaryDto> summaryList = attendanceService.getTodayCellAttendanceSummary();
-      model.addAttribute("summaryList", summaryList);
-      return "attendance_records";
-    }
-
-    // 출석 기록 조회
-
-    List<Attendance> attendances = attendanceService.getAttendancesByCellIdAndDate(cellId, date);
-    int presentCount = (int) attendances.stream()
-        .filter(att -> att.getStatus() == AttendanceStatus.PRESENT
-            || (att.getStatus() == AttendanceStatus.ABSENT
-            && (att.getAbsenceReason() == AbsenceReason.NAVE
-            || att.getAbsenceReason() == AbsenceReason.OTHER_CHURCH)))
-        .count();
-
-    // 셀 이름 (선택한 셀 ID로 조회)
-    String selectedCellName = attendanceService.getCellNameById(cellId);
-
-    model.addAttribute("attendances", attendances);
-    model.addAttribute("presentCount", presentCount);
-    model.addAttribute("selectedCellName", selectedCellName);
-    model.addAttribute("selectedDate", date.toString());
-
-    return "attendance_records";
   }
 
 }
