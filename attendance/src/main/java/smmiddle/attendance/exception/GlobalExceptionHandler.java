@@ -9,12 +9,6 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(ChulCheckException.class)
   public String handleChulCheckException(ChulCheckException e, RedirectAttributes redirectAttributes) {
-
-//    ErrorCode code = e.getErrorCode();
-//
-//    model.addAttribute("errorMessage", code.getMessage());
-//
-//    return "redirect:/";
     redirectAttributes.addFlashAttribute("chulcheckErrorMessage", e.getErrorCode().getMessage());
     return "redirect:/";
 

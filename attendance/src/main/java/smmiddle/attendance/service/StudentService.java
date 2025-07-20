@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
+import smmiddle.attendance.exception.ChulCheckException;
+import smmiddle.attendance.exception.ErrorCode;
 import smmiddle.attendance.repository.CellRepository;
 import smmiddle.attendance.repository.StudentRepository;
 
@@ -20,7 +22,7 @@ public class StudentService {
   @Transactional
   public void addNewStudent(Long cellId, String newStudentName) {
     Cell cell = cellRepository.findById(cellId)
-        .orElseThrow(() -> new IllegalArgumentException("해당 셀을 찾을 수 없습니다."));
+        .orElseThrow(() -> new ChulCheckException(ErrorCode.CELL_NOT_FOUND));
 
     Student student = Student.builder()
         .name(newStudentName)
