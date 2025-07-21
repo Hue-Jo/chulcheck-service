@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>출석 체크</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 30px;
+      background: #fafafa;
+      color: #333;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-weight: 700;
+      color: #2c3e50;
+      text-align: center;
+    }
+
+    .title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .add-btn {
+      background-color: #f2900b;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    input[type="radio"] {
+      display: none;
+    }
+
+    .student-card-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .student-card {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 12px 16px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    .student-name {
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #2c3e50;
+      flex: 1 1 auto;
+      min-width: 100px;
+      white-space: nowrap;
+    }
+
+    .attendance-buttons {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+      margin-left: 16px;
+    }
+
+    .attendance-buttons label {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 2px solid #ccc;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: border-color 0.3s, color 0.3s;
+      user-select: none;
+      display: inline-block;
+      text-align: center;
+      min-width: 60px;
+      background-color: transparent;
+    }
+
+    .attendance-buttons input[type="radio"]:checked + label.present-label {
+      background-color: #e8f5e9; /* 연초록 */
+      color: #1b4d1b !important;
+      border-color: #4caf50 !important;
+      font-weight: 700;
+    }
+
+    .attendance-buttons input[type="radio"]:checked + label.absent-label {
+      background-color: #ffebee; /* 연분홍 */
+      color: #7f2a2a !important;
+      border-color: #f44336 !important;
+      font-weight: 700;
+    }
+
+    .attendance-buttons input[type="radio"]:checked + label.present-label {
+      color: #1b4d1b !important;
+      border-color: #4caf50 !important;
+      font-weight: 700;
+    }
+
+    .attendance-buttons input[type="radio"]:checked + label.absent-label {
+      color: #7f2a2a !important;
+      border-color: #f44336 !important;
+      font-weight: 700;
+    }
+
+    .reason-section {
+      display: none;
+      flex-basis: 100%;
+      margin-top: 8px;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .reason-section select,
+    .reason-section input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    button[type="submit"] {
+      display: block;
+      margin: 30px auto 0;
+      padding: 12px 28px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      background-color: #3f51b5;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(63, 81, 181, 0.4);
+      transition: background-color 0.3s ease;
+    }
+
+    @media (max-width: 480px) {
+      .student-card {
+        padding: 12px 12px;
+      }
+
+      .student-name {
+        font-size: 1.1rem;
+        min-width: 80px;
+      }
+
+      .attendance-buttons label {
+        min-width: 48px;
+        padding: 6px 8px;
+        font-size: 0.85rem;
+      }
+    }
+
+    #studentModal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      position: relative;
+      background: white;
+      padding: 20px 30px 40px;
+      border-radius: 8px;
+      width: 300px;
+    }
+
+    .modal-content input[type="text"] {
+      width: 92%;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      font-size: 30px;
+      font-weight: bold;
+      color: #aaa;
+      cursor: pointer;
+    }
+
+    .modal-buttons {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .modal-buttons .submit-btn {
+      background-color: #3f51b5;
+      color: white;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    /* 토스트 스타일 */
+    #toast {
+      visibility: hidden;
+      min-width: 200px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 12px;
+      padding: 16px 24px;
+      position: fixed;
+      z-index: 9999;
+      left: 50%;
+      bottom: 80px;
+      transform: translateX(-50%);
+      font-size: 1.1rem;
+      font-weight: bold;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      transition: opacity 0.5s ease, visibility 0.5s;
+      opacity: 0;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="title-bar">
+  <h1>📋 출석 체크</h1>
+  <button class="add-btn" type="button" onclick="openStudentModal()">➕ 새 친구</button>
+</div>
+
+<div style="margin-bottom: 10px;">
+  <p><strong>담당 셀 :</strong> <span th:text="${cell.name}"></span></p>
+  <p><strong>담당 교사:</strong> <span th:text="${cell.teacher}"></span></p>
+  <p><strong>출석 날짜:</strong> <span th:text="${#temporals.format(today, 'yyyy-MM-dd')}"></span></p>
+</div>
+
+<form th:action="@{/attendance/submit}" method="post">
+  <input type="hidden" name="cellId" th:value="${cell.id}"/>
+  <input type="hidden" name="date" th:value="${#temporals.format(today, 'yyyy-MM-dd')}"/>
+
+  <div class="student-card-container">
+    <div class="student-card" th:each="student : ${students}">
+      <div class="student-name" th:text="${student.name}">학생 이름</div>
+
+      <div class="attendance-buttons">
+        <input
+            type="radio"
+            th:id="'present_' + ${student.id}"
+            th:name="'status_' + ${student.id}"
+            th:value="'PRESENT'"
+            class="present"
+            th:checked="${attendanceMap == null or attendanceMap[student.id] == null or attendanceMap[student.id]?.status?.name() == 'PRESENT'}"
+            th:onclick="'toggleReasonInput(' + ${student.id} + ')'"
+        />
+        <label th:for="'present_' + ${student.id}" class="present-label">출석</label>
+
+        <input
+            type="radio"
+            th:id="'absent_' + ${student.id}"
+            th:name="'status_' + ${student.id}"
+            th:value="'ABSENT'"
+            class="absent"
+            th:checked="${attendanceMap != null and attendanceMap[student.id] != null and attendanceMap[student.id]?.status?.name() == 'ABSENT'}"
+            th:onclick="'toggleReasonInput(' + ${student.id} + ')'"
+        />
+        <label th:for="'absent_' + ${student.id}" class="absent-label">결석</label>
+      </div>
+
+      <div class="reason-section" th:id="'reasonSection_' + ${student.id}">
+        <select
+            th:name="'absenceReason_' + ${student.id}"
+            th:id="'reasonSelect_' + ${student.id}"
+            th:onchange="'toggleCustomReason(' + ${student.id} + ')'"
+            required
+        >
+          <option value="" disabled selected>선택</option>
+          <option
+              th:each="reason : ${T(smmiddle.attendance.constant.AbsenceReason).values()}"
+              th:value="${reason.name()}"
+              th:selected="${attendanceMap[student.id]?.absenceReason?.name() == reason.name()}"
+              th:text="${reason.displayName}"
+          >
+            사유
+          </option>
+        </select>
+
+        <input
+            type="text"
+            th:name="'customReason_' + ${student.id}"
+            th:id="'customReason_' + ${student.id}"
+            th:value="${attendanceMap[student.id]?.customReason}"
+            placeholder="기타 사유 입력"
+            style="display:none;"
+        />
+      </div>
+    </div>
+  </div>
+
+  <button type="submit">출석 제출</button>
+
+</form>
+<div id="studentModal" style="display:none;">
+  <div class="modal-content">
+    <!-- 오른쪽 상단 X 버튼 -->
+    <button class="close-btn" onclick="closeStudentModal()" aria-label="닫기">&times;</button>
+
+    <h2 style="margin-top: 0;">새 친구 등록</h2>
+    <form id="addStudentForm">
+      <input type="hidden" name="cellId" th:value="${cell.id}"/>
+      <input type="text" name="studentName" placeholder="이름" required
+             style="margin-top: 10px; margin-bottom: 2px;"/>
+      <div class="modal-buttons">
+        <button type="submit" class="submit-btn">등록</button>
+        <p>⚠️ 새 친구를 등록하면 화면이 새로고침되어<br/>기존에 체크했던 출결사항이<br/>초기화될 수 있습니다.</p>
+      </div>
+    </form>
+  </div>
+</div>
+<div id="toast" style="
+  visibility: hidden;
+  min-width: 200px;
+  background-color: #333;
+  color: #fff;
+    text-align: center;
+  border-radius: 12px;
+  padding: 16px 24px;
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  bottom: 80px;
+  transform: translateX(-50%);
+  font-size: 1.1rem;
+  font-weight: bold;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  transition: opacity 0.5s ease, visibility 0.5s;
+  opacity: 0;
+"></div>
+
+</body>
+<script>
+  function toggleReasonInput(studentId) {
+    const presentRadio = document.querySelector(
+        `input[name='status_${studentId}'][value='PRESENT']`
+    );
+    const reasonSection = document.querySelector(`#reasonSection_${studentId}`);
+
+    if (presentRadio.checked) {
+      reasonSection.style.display = 'none';
+      const select = reasonSection.querySelector('select');
+      const customInput = reasonSection.querySelector('input[type="text"]');
+      select.value = '';
+      select.required = false;
+      customInput.style.display = 'none';
+      customInput.value = '';
+    } else {
+      reasonSection.style.display = 'flex';
+      const select = reasonSection.querySelector('select');
+      const customInput = reasonSection.querySelector('input[type="text"]');
+      select.required = true;
+      toggleCustomReason(studentId);
+    }
+  }
+
+  function toggleCustomReason(studentId) {
+    const select = document.getElementById(`reasonSelect_${studentId}`);
+    const customInput = document.getElementById(`customReason_${studentId}`);
+
+    if (select.value === 'OTHER') {
+      customInput.style.display = 'block';
+    } else {
+      customInput.style.display = 'none';
+      customInput.value = '';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // 페이지 로드 시 기존 상태에 따라 사유 입력창 토글
+    document.querySelectorAll('.student-card').forEach(card => {
+      const studentId = card.querySelector("input[type='radio']").name.replace('status_', '');
+      toggleReasonInput(studentId);
+    });
+
+    // 텍스트 입력란에서 Enter키 자동 제출 방지, 키보드 밑으로 내려가게 설정
+    document.querySelectorAll("input[type='text']").forEach(input => {
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          input.blur();
+        }
+      });
+    });
+
+    // 새 친구 등록 폼 이벤트 바인딩
+    const addStudentForm = document.getElementById("addStudentForm");
+    if (addStudentForm) {
+      addStudentForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const formData = new FormData(addStudentForm);
+
+        fetch('/students/add', {
+          method: 'POST',
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            showToast("✅ 새 친구 등록 완료!");
+            setTimeout(() => location.reload(), 1000); // 토스트 보이고 1초 후 새로고침
+          } else {
+            showToast("❌ 등록 실패: " + data.message);
+          }
+          closeStudentModal();
+        })
+        .catch(err => {
+          showToast("⚠️ 오류 발생: " + err.message);
+          closeStudentModal();
+        });
+      });
+
+      // 새 친구 이름 입력창에서 Enter키 눌러도 폼 제출 안되도록 방지
+      const nameInput = addStudentForm.querySelector("input[name='studentName']");
+      if (nameInput) {
+        nameInput.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            nameInput.blur(); // 모바일 키보드 내려가게 처리
+          }
+        });
+      }
+    }
+  });
+
+  // 토스트 메시지 표시 함수
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.style.visibility = "visible";
+    toast.style.opacity = "1";
+
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.visibility = "hidden";
+    }, 1000); // 1초 후 토스트 사라짐
+  }
+
+  // 모달 열기 함수
+  function openStudentModal() {
+    document.getElementById("studentModal").style.display = "flex";
+  }
+
+  // 모달 닫기 함수
+  function closeStudentModal() {
+    document.getElementById("studentModal").style.display = "none";
+  }
+</script>
+
+
+</html>
