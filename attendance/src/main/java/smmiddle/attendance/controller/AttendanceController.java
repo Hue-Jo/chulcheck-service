@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import smmiddle.attendance.constant.AbsenceReason;
 import smmiddle.attendance.dto.AllAttendanceSummaryDto;
+import smmiddle.attendance.dto.AttendanceFormViewDto;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
@@ -28,12 +29,11 @@ import smmiddle.attendance.service.AttendanceService;
 public class AttendanceController {
 
   private final AttendanceService attendanceService;
-
-
   private boolean isNotAuthenticated(HttpSession session) {
     Boolean authenticated = (Boolean) session.getAttribute("authenticated");
     return authenticated == null || !authenticated;
   }
+
 
   // 첫 화면에서 셀 목록 조회
   @GetMapping("/")
@@ -44,7 +44,7 @@ public class AttendanceController {
 
     List<Cell> cells = attendanceService.getAllCells();
     LocalDate today = LocalDate.now();
-    boolean isSunday = today.getDayOfWeek() == DayOfWeek.FRIDAY; // 일요일만
+    boolean isSunday = today.getDayOfWeek() == DayOfWeek.TUESDAY; // 일요일만
 
     AllAttendanceSummaryDto summary = attendanceService.getAttendanceSummary(today);
 
@@ -63,28 +63,6 @@ public class AttendanceController {
     return "select_cell";
   }
 
-  // 선택한 셀의 출석체크 폼
-  @GetMapping("/attendance/form")
-  public String showAttendanceForm(
-      HttpSession session,
-      @RequestParam Long cellId, Model model) {
-
-    if (isNotAuthenticated(session)) {
-      return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
-    }
-
-    Cell cell = attendanceService.getCellById(cellId);
-    List<Student> students = attendanceService.getAllStudentsByCellId(cellId);
-
-    model.addAttribute("cell", cell);
-    model.addAttribute("students", students);
-    model.addAttribute("today", LocalDate.now());
-    model.addAttribute("absenceReasons", AbsenceReason.values());
-    model.addAttribute("attendanceMap", Collections.emptyMap());
-
-    return "attendance_form";
-  }
-
 
   // 출석폼 제출/수정
   @PostMapping("/attendance/submit")
@@ -100,6 +78,29 @@ public class AttendanceController {
   }
 
 
+  // 선택한 셀의 출석체크 폼
+  @GetMapping("/attendance/form")
+  public String showAttendanceForm(
+      HttpSession session,
+      @RequestParam Long cellId, Model model) {
+
+    if (isNotAuthenticated(session)) {
+      return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
+    }
+
+    AttendanceFormViewDto dto = AttendanceFormViewDto.builder()
+        .cell(attendanceService.getCellById(cellId))
+        .students(attendanceService.getAllStudentsByCellId(cellId))
+        .today(LocalDate.now())
+        .absenceReasons(List.of(AbsenceReason.values()))
+        .attendanceMap(Collections.emptyMap())
+        .build();
+
+    model.addAttribute("formDto", dto);
+    return "attendance_form";
+  }
+
+
   @GetMapping("/attendance/edit")
   public String showEditAttendanceForm(
       HttpSession session,
@@ -109,15 +110,16 @@ public class AttendanceController {
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
 
-    Cell cell = attendanceService.getCellById(cellId);
-    List<Student> students = attendanceService.getAllStudentsByCellId(cellId);
-    Map<Long, Attendance> existingAttendanceMap = attendanceService.getAttendanceMap(cellId, LocalDate.now());
+    AttendanceFormViewDto dto = AttendanceFormViewDto.builder()
+        .cell(attendanceService.getCellById(cellId))
+        .students(attendanceService.getAllStudentsByCellId(cellId))
+        .today(LocalDate.now())
+        .absenceReasons(List.of(AbsenceReason.values()))
+        .attendanceMap(attendanceService.getAttendanceMap(cellId, LocalDate.now()))
+        .isEdit(true)
+        .build();
 
-    model.addAttribute("cell", cell);
-    model.addAttribute("students", students);
-    model.addAttribute("today", LocalDateTime.now());
-    model.addAttribute("attendanceMap", existingAttendanceMap);
-    model.addAttribute("isEdit", true); // 수정 여부 표시
+    model.addAttribute("formDto", dto);
     return "attendance_form";
   }
 

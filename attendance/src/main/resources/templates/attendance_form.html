@@ -40,6 +40,11 @@
       display: none;
     }
 
+    .section-divider {
+      border-top: 1px solid #ccc;
+      margin: 24px 0 12px;
+    }
+
     .student-card-container {
       display: flex;
       flex-direction: column;
@@ -54,7 +59,7 @@
       background: #fff;
       border: 1px solid #ddd;
       border-radius: 10px;
-      padding: 12px 16px;
+      padding: 12px 20px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
       max-width: 100%;
       box-sizing: border-box;
@@ -67,6 +72,7 @@
       flex: 1 1 auto;
       min-width: 100px;
       white-space: nowrap;
+      margin-left: 10px;
     }
 
     .attendance-buttons {
@@ -77,29 +83,29 @@
     }
 
     .attendance-buttons label {
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: 8px;
       border: 2px solid #ccc;
-      font-weight: 600;
-      font-size: 0.9rem;
+      font-weight: bold;
+      font-size: 1rem;
       cursor: pointer;
       transition: border-color 0.3s, color 0.3s;
       user-select: none;
       display: inline-block;
       text-align: center;
-      min-width: 60px;
+      min-width: 50px;
       background-color: transparent;
     }
 
     .attendance-buttons input[type="radio"]:checked + label.present-label {
-      background-color: #e8f5e9; /* 연초록 */
+      background-color: #e8f5e9;
       color: #1b4d1b !important;
       border-color: #4caf50 !important;
       font-weight: 700;
     }
 
     .attendance-buttons input[type="radio"]:checked + label.absent-label {
-      background-color: #ffebee; /* 연분홍 */
+      background-color: #ffebee;
       color: #7f2a2a !important;
       border-color: #f44336 !important;
       font-weight: 700;
@@ -161,9 +167,9 @@
       }
 
       .attendance-buttons label {
-        min-width: 48px;
+        min-width: 46px;
         padding: 6px 8px;
-        font-size: 0.85rem;
+        font-size: 1rem;
       }
     }
 
@@ -238,7 +244,7 @@
       transform: translateX(-50%);
       font-size: 1.1rem;
       font-weight: bold;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
       transition: opacity 0.5s ease, visibility 0.5s;
       opacity: 0;
     }
@@ -253,17 +259,19 @@
 </div>
 
 <div style="margin-bottom: 10px;">
-  <p><strong>담당 셀 :</strong> <span th:text="${cell.name}"></span></p>
-  <p><strong>담당 교사:</strong> <span th:text="${cell.teacher}"></span></p>
-  <p><strong>출석 날짜:</strong> <span th:text="${#temporals.format(today, 'yyyy-MM-dd')}"></span></p>
+  <p><strong>담당 셀 :</strong> <span th:text="${formDto.cell.name}"></span></p>
+  <p><strong>담당 교사:</strong> <span th:text="${formDto.cell.teacher}"></span></p>
+  <p><strong>출석 날짜:</strong> <span th:text="${#temporals.format(formDto.today, 'yyyy-MM-dd')}"></span></p>
 </div>
 
+<div class="section-divider"></div>
+
 <form th:action="@{/attendance/submit}" method="post">
-  <input type="hidden" name="cellId" th:value="${cell.id}"/>
-  <input type="hidden" name="date" th:value="${#temporals.format(today, 'yyyy-MM-dd')}"/>
+  <input type="hidden" name="cellId" th:value="${formDto.cell.id}"/>
+  <input type="hidden" name="date" th:value="${#temporals.format(formDto.today, 'yyyy-MM-dd')}"/>
 
   <div class="student-card-container">
-    <div class="student-card" th:each="student : ${students}">
+    <div class="student-card" th:each="student : ${formDto.students}">
       <div class="student-name" th:text="${student.name}">학생 이름</div>
 
       <div class="attendance-buttons">
@@ -273,7 +281,7 @@
             th:name="'status_' + ${student.id}"
             th:value="'PRESENT'"
             class="present"
-            th:checked="${attendanceMap == null or attendanceMap[student.id] == null or attendanceMap[student.id]?.status?.name() == 'PRESENT'}"
+            th:checked="${formDto.attendanceMap == null or formDto.attendanceMap[student.id] == null or formDto.attendanceMap[student.id]?.status?.name() == 'PRESENT'}"
             th:onclick="'toggleReasonInput(' + ${student.id} + ')'"
         />
         <label th:for="'present_' + ${student.id}" class="present-label">출석</label>
@@ -284,7 +292,7 @@
             th:name="'status_' + ${student.id}"
             th:value="'ABSENT'"
             class="absent"
-            th:checked="${attendanceMap != null and attendanceMap[student.id] != null and attendanceMap[student.id]?.status?.name() == 'ABSENT'}"
+            th:checked="${formDto.attendanceMap != null and formDto.attendanceMap[student.id]?.status?.name() == 'ABSENT'}"
             th:onclick="'toggleReasonInput(' + ${student.id} + ')'"
         />
         <label th:for="'absent_' + ${student.id}" class="absent-label">결석</label>
@@ -299,9 +307,9 @@
         >
           <option value="" disabled selected>선택</option>
           <option
-              th:each="reason : ${T(smmiddle.attendance.constant.AbsenceReason).values()}"
+              th:each="reason : ${formDto.absenceReasons}"
               th:value="${reason.name()}"
-              th:selected="${attendanceMap[student.id]?.absenceReason?.name() == reason.name()}"
+              th:selected="${formDto.attendanceMap[student.id]?.absenceReason?.name() == reason.name()}"
               th:text="${reason.displayName}"
           >
             사유
@@ -312,7 +320,7 @@
             type="text"
             th:name="'customReason_' + ${student.id}"
             th:id="'customReason_' + ${student.id}"
-            th:value="${attendanceMap[student.id]?.customReason}"
+            th:value="${formDto.attendanceMap[student.id]?.customReason}"
             placeholder="기타 사유 입력"
             style="display:none;"
         />
@@ -320,7 +328,7 @@
     </div>
   </div>
 
-  <button type="submit">출석 제출</button>
+  <button type="submit">출결사항 제출</button>
 
 </form>
 <div id="studentModal" style="display:none;">
@@ -330,7 +338,7 @@
 
     <h2 style="margin-top: 0;">새 친구 등록</h2>
     <form id="addStudentForm">
-      <input type="hidden" name="cellId" th:value="${cell.id}"/>
+      <input type="hidden" name="cellId" th:value="${formDto.cell.id}"/>
       <input type="text" name="studentName" placeholder="이름" required
              style="margin-top: 10px; margin-bottom: 2px;"/>
       <div class="modal-buttons">
@@ -345,7 +353,7 @@
   min-width: 200px;
   background-color: #333;
   color: #fff;
-    text-align: center;
+  text-align: center;
   border-radius: 12px;
   padding: 16px 24px;
   position: fixed;
