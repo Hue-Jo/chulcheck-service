@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
   CELL_NOT_FOUND("존재하지 않는 셀입니다.", HttpStatus.NOT_FOUND),
-  INVALID_CELL_ID("유효하지 않은 셀입니다", HttpStatus.BAD_REQUEST);
+  INVALID_CELL_ID("유효하지 않은 셀입니다", HttpStatus.BAD_REQUEST),
+  INVALID_ABSENCE_REASON("결석사유는 필수입니다.", HttpStatus.BAD_REQUEST);
 
   private final String message;
   private final HttpStatus httpStatus;

@@ -34,6 +34,10 @@ public class AttendanceService {
   private final StudentRepository studentRepository;
   private final CellRepository cellRepository;
 
+  private static final String STATUS_PREFIX = "status_";
+  private static final String ABSENCE_REASON_PREFIX = "absenceReason_";
+  private static final String CUSTOM_REASON_PREFIX = "customReason_";
+
   /**
    * 모든 셀 조회
    */
@@ -101,16 +105,22 @@ public class AttendanceService {
   }
 
   /**
+   * 출석 수 계산 메서드
+   */
+  public boolean countsAsPresent(Attendance att) {
+    return att.getStatus() == AttendanceStatus.PRESENT
+        || (att.getStatus() == AttendanceStatus.ABSENT &&
+        (att.getAbsenceReason() == AbsenceReason.NAVE || att.getAbsenceReason() == AbsenceReason.OTHER_CHURCH));
+  }
+
+  /**
    * 오늘 특정 셀의 출석 학생 수 반환
    */
   public int getTodayPresentCount(Long cellId, LocalDate date) {
     List<Attendance> attendances = attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
 
     int count = (int) attendances.stream()
-        .filter(att -> att.getStatus() == AttendanceStatus.PRESENT ||
-            (att.getStatus() == AttendanceStatus.ABSENT &&
-                (att.getAbsenceReason() == AbsenceReason.NAVE ||
-                 att.getAbsenceReason() == AbsenceReason.OTHER_CHURCH)))
+        .filter(this::countsAsPresent)
         .count();
 
     log.debug("셀 ID [{}], 날짜 [{}]의 출석 인원 수: {}", cellId, date, count);
@@ -156,9 +166,9 @@ public class AttendanceService {
     List<Student> students = studentRepository.findByCell_IdOrderByNameAsc(cellId);
 
     for (Student student : students) {
-      String statusParam = request.getParameter("status_" + student.getId());
-      String absenceReasonParam = request.getParameter("absenceReason_" + student.getId());
-      String customReasonParam = request.getParameter("customReason_" + student.getId());
+      String statusParam = request.getParameter(STATUS_PREFIX + student.getId());
+      String absenceReasonParam = request.getParameter(ABSENCE_REASON_PREFIX + student.getId());
+      String customReasonParam = request.getParameter(CUSTOM_REASON_PREFIX + student.getId());
 
       AttendanceStatus status = AttendanceStatus.valueOf(statusParam);
       AbsenceReason absenceReason = null;
@@ -166,7 +176,7 @@ public class AttendanceService {
 
       if (status == AttendanceStatus.ABSENT) {
         if (absenceReasonParam == null || absenceReasonParam.isEmpty()) {
-          throw new IllegalArgumentException("결석 사유는 반드시 입력해야 합니다.");
+          throw new ChulCheckException(ErrorCode.INVALID_ABSENCE_REASON);
         }
         absenceReason = AbsenceReason.valueOf(absenceReasonParam);
         if (absenceReason == AbsenceReason.OTHER) {
@@ -217,17 +227,24 @@ public class AttendanceService {
     LocalDate today = LocalDate.now();
     List<Cell> cells = cellRepository.findAll();
     List<CellAttendanceSummaryDto> summaries = new ArrayList<>();
-    for (Cell cell : cells) {
 
+    for (Cell cell : cells) {
       boolean submitted = attendanceRepository.existsByStudent_Cell_IdAndDate(cell.getId(), today);
 
-      // 제출했으면 출석 인원 수, 아니면 "⌛"
-      String presentCountDisplay = submitted
-          ? attendanceRepository.countByStudent_Cell_IdAndDateAndStatus(cell.getId(), today, AttendanceStatus.PRESENT) + "명"
-          : "⌛";
+      String presentCountDisplay;
+      if (submitted) {
+        List<Attendance> attendances = attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cell.getId(), today);
+        long presentCount = attendances.stream()
+            .filter(this::countsAsPresent)
+            .count();
+        presentCountDisplay = presentCount + "명";
+      } else {
+        presentCountDisplay = "⌛";
+      }
 
       summaries.add(new CellAttendanceSummaryDto(cell.getName(), submitted, presentCountDisplay));
     }
+
     return summaries;
   }
 
