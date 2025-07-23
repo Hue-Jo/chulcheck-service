@@ -1,23 +1,280 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>셀 선택</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fafafa;
+      color: #333;
+      margin: 40px auto;
+      max-width: 900px;
+      padding: 0 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+
+    p {
+      text-align: center;
+      font-size: 1rem;
+      margin-top: 5px;
+      color: #555;
+    }
+
+    /* 버튼 공통 */
+    .btn {
+      padding: 10px 22px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.25s ease;
+    }
+
+    .btn-submit {
+      background-color: #3f51b5;
+      color: white;
+      box-shadow: 0 4px 6px rgba(63, 81, 181, 0.4);
+    }
+
+    .btn-submit:disabled {
+      background-color: #a3a3a3;
+      cursor: not-allowed;
+    }
+
+    .btn-edit {
+      background-color: #a3a3a3;
+      color: white;
+    }
+
+    .btn-edit:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .scroll-down-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 20px;
+      z-index: 1000;
+      background-color: rgba(50, 50, 50, 0.7); /* 회색끼 도는 투명 배경 */
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.3s ease;
+    }
+
+    /* 메시지 */
+    .message {
+      position: fixed;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      padding: 33px 40px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      opacity: 1;
+      transition: opacity 1s ease, top 0.4s ease;
+      animation: fadeInUp 0.5s ease;
+      max-width: 80vw;
+      min-width: 270px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; top: 50px; }
+      to { opacity: 1; top: 30px; }
+    }
+
+    .message-success {
+      background-color: #d0f0ec;
+      color: #137c74;
+      border: 1px solid #a2e1db;
+    }
+
+    .message-error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    /* 테이블 */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 30px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgb(0 0 0 / 0.05);
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: center;
+      font-size: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background-color: #f4f6f8;
+      font-weight: 700;
+      color: #4a4a4a;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-submitted {
+      color: #2e7d32;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .status-pending {
+      color: #c62828;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .records-btn-container {
+      text-align: center;
+      margin-top: 40px;
+    }
+  </style>
 </head>
-
 <body>
-<h1>셀을 선택하세요</h1>
-<form th:action="@{/attendance/form}" method="get">
-  <label for="cellId">셀:</label>
-  <select name="cellId" id="cellId" required>
-    <option th:each="cell : ${cells}"
-            th:value="${cell.id}"
-            th:text="${cell.name}">
-    </option>
-  </select>
 
-  <button type="submit">출석체크 하러 가기</button>
-</form>
+<button id="scrollToBottomBtn" class="scroll-down-btn">⬇</button>
+
+<div style="position: relative;">
+  <h1>출석부</h1>
+</div>
+
+<!-- 메시지 -->
+<div th:if="${success}" class="message message-success" th:text="${success}"></div>
+<div th:if="${error}" class="message message-error" th:text="${error}"></div>
+
+<!-- 최근 수정시간 -->
+<div th:if="${lastUpdatedTime != null and isSunday}" style="text-align: center; margin-top: 10px;">
+  <p>
+    🕓 마지막 수정:
+    <span th:text="${#temporals.format(lastUpdatedTime, 'yyyy-MM-dd HH:mm')}"></span>
+    (<span th:text="${lastUpdatedCellName}"></span>)
+  </p>
+</div>
+
+<!-- 셀 테이블 -->
+<table>
+  <thead>
+  <tr>
+    <th>셀</th>
+    <th>교사</th>
+    <th>제출 여부</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="cell : ${cells}">
+    <td th:text="${cell.name}">셀 이름</td>
+    <td th:text="${cell.teacher}">교사 이름</td>
+    <td th:text="${attendanceStatusMap[cell.id] ? '✅' : '❌'}"
+        th:classappend="${attendanceStatusMap[cell.id]} ? 'status-submitted' : 'status-pending'"></td>
+    <td>
+      <form th:if="${!attendanceStatusMap[cell.id]}" th:action="@{/attendance/form}" method="get">
+        <input type="hidden" name="cellId" th:value="${cell.id}"/>
+        <button type="submit" class="btn btn-submit" th:disabled="${!isSunday}">출석</button>
+      </form>
+      <form th:if="${attendanceStatusMap[cell.id]}" th:action="@{/attendance/edit}" method="get">
+        <input type="hidden" name="cellId" th:value="${cell.id}"/>
+        <button type="submit" class="btn btn-edit" th:disabled="${!isSunday}">수정</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- 출석 집계 현황 -->
+<div style="margin-top: 30px; text-align: center;">
+  <p th:if="${allSubmitted}" style="font-weight: bold; font-size: 1.1rem;">
+    전체 출석 인원: <span th:text="${todayPresentCount}"></span>명
+  </p>
+  <p th:if="${!allSubmitted}" style="color: gray; font-style: italic;">
+    🔄 출석 집계 중 (아직 제출하지 않은 셀이 있습니다)
+  </p>
+</div>
+
+<!-- 출결 내역 버튼 -->
+<div class="records-btn-container">
+  <form th:action="@{/attendance/records}" method="get">
+    <button type="submit" class="btn btn-submit">📋 셀별 출결 내역</button>
+  </form>
+</div>
+
+<!-- 예외 모달 -->
+<div id="errorModal" style="display: none; position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+  <div style="background: white; padding: 20px 30px; border-radius: 10px; text-align: center;">
+    <p id="modalErrorMessage" style="margin-bottom: 20px;"></p>
+    <button onclick="closeModal()">확인</button>
+  </div>
+</div>
+
+<script>
+  document.getElementById("scrollToBottomBtn").addEventListener("click", () => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const messages = document.querySelectorAll('.message-success, .message-error');
+    messages.forEach((msg) => {
+      setTimeout(() => {
+        msg.style.opacity = '0';
+        msg.style.top = '0px';
+        setTimeout(() => {
+          msg.style.display = 'none';
+        }, 1000);
+      }, 2000);
+    });
+  });
+
+  function showModal(message) {
+    document.getElementById('modalErrorMessage').textContent = message;
+    document.getElementById('errorModal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    window.location.href = "/";
+  }
+</script>
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  const errorMessage = /*[[${chulcheckErrorMessage}]]*/ null;
+  if (errorMessage) {
+    showModal(errorMessage);
+  }
+  /*]]>*/
+</script>
 </body>
 </html>
