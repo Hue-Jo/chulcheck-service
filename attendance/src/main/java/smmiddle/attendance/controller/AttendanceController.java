@@ -44,7 +44,7 @@ public class AttendanceController {
 
     List<Cell> cells = attendanceService.getAllCells();
     LocalDate today = LocalDate.now();
-    boolean isSunday = today.getDayOfWeek() == DayOfWeek.WEDNESDAY; // 일요일만
+    boolean isSunday = today.getDayOfWeek() == DayOfWeek.SUNDAY; // 일요일만
 
     AllAttendanceSummaryDto summary = attendanceService.getAttendanceSummary(today);
 
