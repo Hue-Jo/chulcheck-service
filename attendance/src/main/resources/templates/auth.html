@@ -4,83 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>출석 인증</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f2f4f8;
-      margin: 0;
-      padding: 40px 20px;
-    }
-
-    .container {
-      background: white;
-      padding: 40px 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      max-width: 400px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      margin-bottom: 24px; /* 여백 넉넉하게 */
-      color: #2c3e50;
-    }
-
-    p {
-      font-size: 1rem;
-      margin-bottom: 30px;
-      color: #555;
-    }
-
-    input.code-input {
-      width: 240px;
-      margin-bottom: 15px;
-      padding: 15px;
-      font-size: 1.3rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      text-align: center;
-      transition: border-color 0.2s ease;
-    }
-
-    button[type="submit"] {
-      background-color: #3f51b5;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.25s ease;
-    }
-
-    button[type="submit"]:hover:not(:disabled) {
-      background-color: #303f9f;
-    }
-
-    .message {
-      margin-bottom: 15px;
-      padding: 5px;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: bold;
-    }
-
-    .message-error {
-      background-color: #ffe0e0;
-      color: #b00020;
-      border: 1px solid #f5c6cb;
-    }
-  </style>
-
+  <link rel="stylesheet" href="/css/auth.css"/>
 </head>
 <body>
 
 <div class="container">
-  <h1>🔐 중등부 인증</h1>
+  <h1>🔐 중등부 교사 인증</h1>
   <p>이번달의 인증번호를 입력하세요</p>
 
   <div th:if="${error}" class="message message-error">

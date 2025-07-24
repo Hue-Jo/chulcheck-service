@@ -1,0 +1,243 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 30px;
+  background: #fafafa;
+  color: #333;
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.add-btn {
+  background-color: #f2900b;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+input[type="radio"] {
+  display: none;
+}
+
+.section-divider {
+  border-top: 1px solid #ccc;
+  margin: 24px 0 12px;
+}
+
+.student-card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.student-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.student-name {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #2c3e50;
+  flex: 1 1 auto;
+  min-width: 100px;
+  white-space: nowrap;
+  margin-left: 10px;
+}
+
+.attendance-buttons {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.attendance-buttons label {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 2px solid #ccc;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.3s;
+  user-select: none;
+  display: inline-block;
+  text-align: center;
+  min-width: 50px;
+  background-color: transparent;
+}
+
+.attendance-buttons input[type="radio"]:checked + label.present-label {
+  background-color: #e8f5e9;
+  color: #1b4d1b !important;
+  border-color: #4caf50 !important;
+  font-weight: 700;
+}
+
+.attendance-buttons input[type="radio"]:checked + label.absent-label {
+  background-color: #ffebee;
+  color: #7f2a2a !important;
+  border-color: #f44336 !important;
+  font-weight: 700;
+}
+
+.attendance-buttons input[type="radio"]:checked + label.present-label {
+  color: #1b4d1b !important;
+  border-color: #4caf50 !important;
+  font-weight: 700;
+}
+
+.attendance-buttons input[type="radio"]:checked + label.absent-label {
+  color: #7f2a2a !important;
+  border-color: #f44336 !important;
+  font-weight: 700;
+}
+
+.reason-section {
+  display: none;
+  flex-basis: 100%;
+  margin-top: 8px;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reason-section select,
+.reason-section input[type="text"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+button[type="submit"] {
+  display: block;
+  margin: 30px auto 0;
+  padding: 12px 28px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  background-color: #3f51b5;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(63, 81, 181, 0.4);
+  transition: background-color 0.3s ease;
+}
+
+@media (max-width: 480px) {
+  .student-card {
+    padding: 12px 12px;
+  }
+
+  .student-name {
+    font-size: 1.1rem;
+    min-width: 80px;
+  }
+
+  .attendance-buttons label {
+    min-width: 46px;
+    padding: 6px 8px;
+    font-size: 1rem;
+  }
+}
+
+#studentModal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  position: relative;
+  background: white;
+  padding: 20px 30px 40px;
+  border-radius: 8px;
+  width: 300px;
+}
+
+.modal-content input[type="text"] {
+  width: 92%;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 30px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.modal-buttons {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.modal-buttons .submit-btn {
+  background-color: #3f51b5;
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+/* 토스트 스타일 */
+#toast {
+  visibility: hidden;
+  min-width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 12px;
+  padding: 16px 24px;
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  bottom: 80px;
+  transform: translateX(-50%);
+  font-size: 1.1rem;
+  font-weight: bold;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.5s ease, visibility 0.5s;
+  opacity: 0;
+}
