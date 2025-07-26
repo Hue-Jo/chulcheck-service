@@ -2,7 +2,7 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #fafafa;
   color: #333;
-  margin: 40px auto;
+  margin: 30px auto  80px;
   max-width: 900px;
   padding: 0 20px;
 }
@@ -55,7 +55,7 @@ p {
 
 .scroll-down-btn {
   position: fixed;
-  bottom: 30px;
+  bottom: 60px;
   right: 20px;
   z-index: 1000;
   background-color: rgba(50, 50, 50, 0.8); /* 회색끼 도는 투명 배경 */
