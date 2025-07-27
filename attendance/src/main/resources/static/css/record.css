@@ -132,24 +132,24 @@ th {
 }
 
 
-.back-button {
-  margin-top: 40px;
-  text-align: center;
-}
+/*.back-button {*/
+/*  margin-top: 40px;*/
+/*  text-align: center;*/
+/*}*/
 
-.back-button button {
-  background-color: #95a5a6;
-  color: white;
-  padding: 10px 24px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-}
+/*.back-button button {*/
+/*  background-color: #95a5a6;*/
+/*  color: white;*/
+/*  padding: 10px 24px;*/
+/*  border: none;*/
+/*  border-radius: 8px;*/
+/*  font-weight: bold;*/
+/*  cursor: pointer;*/
+/*}*/
 
-.back-button button:hover {
-  background-color: #7f8c8d;
-}
+/*.back-button button:hover {*/
+/*  background-color: #7f8c8d;*/
+/*}*/
 
 @media (min-width: 768px) {
   .filter-section {

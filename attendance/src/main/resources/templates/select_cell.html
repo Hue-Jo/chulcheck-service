@@ -22,12 +22,13 @@
 <div th:if="${success}" class="message message-success" th:text="${success}"></div>
 <div th:if="${error}" class="message message-error" th:text="${error}"></div>
 
-<!-- 최근 수정시간 -->
-<div th:if="${lastUpdatedTime != null and isSunday}" style="text-align: center; margin-top: 10px;">
-  <p>
-    🕓 마지막 수정:
-    <span th:text="${#temporals.format(lastUpdatedTime, 'yyyy-MM-dd HH:mm')}"></span>
-    (<span th:text="${lastUpdatedCellName}"></span>)
+<!-- 출석 집계 현황 -->
+<div style="margin-top: 30px; text-align: center;">
+  <p th:if="${allSubmitted}" style="font-weight: bold; font-size: 1.1rem;">
+    전체 출석 인원: <span th:text="${todayPresentCount}"></span>명
+  </p>
+  <p th:if="${!allSubmitted}" style="color: gray; font-style: italic;">
+    🔄 출석 집계 중 (아직 제출하지 않은 셀이 있습니다)
   </p>
 </div>
 
@@ -61,22 +62,21 @@
   </tbody>
 </table>
 
-<!-- 출석 집계 현황 -->
-<div style="margin-top: 30px; text-align: center;">
-  <p th:if="${allSubmitted}" style="font-weight: bold; font-size: 1.1rem;">
-    전체 출석 인원: <span th:text="${todayPresentCount}"></span>명
-  </p>
-  <p th:if="${!allSubmitted}" style="color: gray; font-style: italic;">
-    🔄 출석 집계 중 (아직 제출하지 않은 셀이 있습니다)
+<!-- 최근 수정시간 -->
+<div th:if="${lastUpdatedTime != null and isSunday}" style="text-align: center; margin-top: 10px;">
+  <p>
+    🕓 마지막 수정:
+    <span th:text="${#temporals.format(lastUpdatedTime, 'yyyy-MM-dd HH:mm')}"></span>
+    (<span th:text="${lastUpdatedCellName}"></span>)
   </p>
 </div>
 
 <!-- 출결 내역 버튼 -->
-<div class="records-btn-container">
-  <form th:action="@{/attendance/records}" method="get">
-    <button type="submit" class="btn btn-submit">📋 셀별 출결 내역</button>
-  </form>
-</div>
+<!--<div class="records-btn-container">-->
+<!--  <form th:action="@{/attendance/records}" method="get">-->
+<!--    <button type="submit" class="btn btn-submit">📋 셀별 출결 내역</button>-->
+<!--  </form>-->
+<!--</div>-->
 
 <!-- 예외 모달 -->
 <div id="errorModal" style="display: none; position: fixed; top: 0; left: 0;
