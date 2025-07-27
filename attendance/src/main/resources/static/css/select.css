@@ -20,6 +20,10 @@ p {
   color: #555;
 }
 
+.active-nav span:first-child {
+  filter: drop-shadow(0 0 3px black);
+}
+
 /* 버튼 공통 */
 .btn {
   padding: 10px 22px;
