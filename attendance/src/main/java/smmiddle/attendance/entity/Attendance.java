@@ -14,9 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import smmiddle.attendance.constant.AbsenceReason;
 import smmiddle.attendance.constant.AttendanceStatus;
@@ -53,7 +51,7 @@ public class Attendance {
 
   public void updateStatus(AttendanceStatus status, AbsenceReason absenceReason, String customReason) {
     this.status = status;
-    if (status == AttendanceStatus.ABSENT) {
+    if (status == AttendanceStatus.ABSENT || status == AttendanceStatus.ALLOWED) {
       if (absenceReason == AbsenceReason.OTHER) {
         this.customReason = customReason;
         this.absenceReason = AbsenceReason.OTHER;
@@ -66,4 +64,5 @@ public class Attendance {
       this.customReason = null;
     }
     this.updatedDate = LocalDateTime.now();
-  }}
+  }
+}
