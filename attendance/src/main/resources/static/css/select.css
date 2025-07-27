@@ -24,6 +24,22 @@ p {
   filter: drop-shadow(0 0 3px black);
 }
 
+.warning-card {
+  background-color: #fff4f4;
+  border: 2px solid orangered;
+  border-radius: 10px;
+  padding: 12px 20px;
+  margin-top: 10px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: orangered;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  user-select: none;
+}
+
 /* 버튼 공통 */
 .btn {
   padding: 10px 22px;
@@ -34,29 +50,22 @@ p {
   cursor: pointer;
   user-select: none;
   transition: background-color 0.25s ease;
+  color: white;
 }
 
 .btn-submit {
   background-color: #3f51b5;
-  color: white;
   box-shadow: 0 4px 6px rgba(63, 81, 181, 0.4);
-}
-
-.btn-submit:disabled {
-  background-color: #a3a3a3;
-  cursor: not-allowed;
 }
 
 .btn-edit {
   background-color: #a3a3a3;
-  color: white;
 }
 
-.btn-edit:disabled {
-  background-color: #cccccc;
+.btn-submit:disabled, .btn-edit:disabled {
+  background-color: #a3a3a3;
   cursor: not-allowed;
 }
-
 .scroll-down-btn {
   position: fixed;
   bottom: 60px;
