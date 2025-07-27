@@ -71,7 +71,7 @@
     <tr th:each="att : ${attendances}">
       <td th:text="${att.student.name}"></td>
       <td>
-        <span th:if="${att.status.name() == 'PRESENT' or (att.status.name() == 'ABSENT' and (att.absenceReason.name() == 'NAVE' or att.absenceReason.name() == 'OTHER_CHURCH'))}" class="present">✅</span>
+        <span th:if="${att.status.name() == 'PRESENT' or att.status.name() == 'ALLOWED'}" class="present">✅</span>
         <span th:if="${att.status.name() == 'ABSENT' and (att.absenceReason.name() != 'NAVE' and att.absenceReason.name() != 'OTHER_CHURCH')}" class="absent">❌</span>
       </td>
       <td>
@@ -92,11 +92,15 @@
   </table>
 </div>
 
-<div class="back-button">
-  <form th:action="@{/}" method="get">
-    <button type="submit">🏠 첫 화면으로 돌아가기</button>
-  </form>
-</div>
+<!--<div class="back-button">-->
+<!--  <form th:action="@{/}" method="get">-->
+<!--    <button type="submit">🏠 첫 화면으로 돌아가기</button>-->
+<!--  </form>-->
+<!--</div>-->
+
+<div th:replace="~{nav :: bottom-nav}"></div>
+
+
 </body>
 
 </html>

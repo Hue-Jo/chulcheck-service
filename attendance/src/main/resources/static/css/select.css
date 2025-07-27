@@ -2,7 +2,7 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #fafafa;
   color: #333;
-  margin: 40px auto;
+  margin: 30px auto  80px;
   max-width: 900px;
   padding: 0 20px;
 }
@@ -55,10 +55,10 @@ p {
 
 .scroll-down-btn {
   position: fixed;
-  bottom: 30px;
+  bottom: 60px;
   right: 20px;
   z-index: 1000;
-  background-color: rgba(50, 50, 50, 0.7); /* 회색끼 도는 투명 배경 */
+  background-color: rgba(50, 50, 50, 0.8); /* 회색끼 도는 투명 배경 */
   color: white;
   border: none;
   border-radius: 50%;
@@ -80,7 +80,7 @@ p {
   padding: 33px 40px;
   border-radius: 8px;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 1.2rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   opacity: 1;
   transition: opacity 1s ease, top 0.4s ease;
@@ -115,6 +115,7 @@ table {
   border-collapse: collapse;
   width: 100%;
   margin-top: 30px;
+  margin-bottom: 20px;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 0 8px rgb(0 0 0 / 0.05);
@@ -141,16 +142,16 @@ tr:last-child td {
 .status-submitted {
   color: #2e7d32;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
 
 .status-pending {
   color: #c62828;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.2em;
 }
 
-.records-btn-container {
-  text-align: center;
-  margin-top: 40px;
-}
+/*.records-btn-container {*/
+/*  text-align: center;*/
+/*  margin-top: 40px;*/
+/*}*/

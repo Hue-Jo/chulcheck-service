@@ -1,3 +1,4 @@
+
 function toggleReasonInput(studentId) {
   const presentRadio = document.querySelector(
       `input[name='status_${studentId}'][value='PRESENT']`

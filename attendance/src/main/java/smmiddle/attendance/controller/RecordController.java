@@ -56,10 +56,7 @@ public class RecordController {
     // 출석 기록 조회
     List<Attendance> attendances = attendanceService.getAttendancesByCellIdAndDate(cellId, date);
     int presentCount = (int) attendances.stream()
-        .filter(att -> att.getStatus() == AttendanceStatus.PRESENT
-            || (att.getStatus() == AttendanceStatus.ABSENT
-            && (att.getAbsenceReason() == AbsenceReason.NAVE
-            || att.getAbsenceReason() == AbsenceReason.OTHER_CHURCH)))
+        .filter(attendanceService::countsAsPresent)
         .count();
 
     // 셀 이름 (선택한 셀 ID로 조회)

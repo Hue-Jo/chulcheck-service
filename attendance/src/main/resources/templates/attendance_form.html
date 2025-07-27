@@ -48,7 +48,7 @@
             th:name="'status_' + ${student.id}"
             th:value="'ABSENT'"
             class="absent"
-            th:checked="${formDto.attendanceMap != null and formDto.attendanceMap[student.id]?.status?.name() == 'ABSENT'}"
+            th:checked="${formDto.attendanceMap != null and (formDto.attendanceMap[student.id]?.status?.name() == 'ABSENT' or formDto.attendanceMap[student.id]?.status?.name() == 'ALLOWED')}"
             th:onclick="'toggleReasonInput(' + ${student.id} + ')'"
         />
         <label th:for="'absent_' + ${student.id}" class="absent-label">결석</label>
@@ -123,5 +123,8 @@
   transition: opacity 0.5s ease, visibility 0.5s;
   opacity: 0;
 "></div>
+
+<div th:replace="~{nav :: bottom-nav}"></div>
+
 </body>
 </html>

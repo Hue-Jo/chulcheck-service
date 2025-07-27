@@ -109,8 +109,8 @@ public class AttendanceService {
    */
   public boolean countsAsPresent(Attendance att) {
     return att.getStatus() == AttendanceStatus.PRESENT
-        || (att.getStatus() == AttendanceStatus.ABSENT &&
-        (att.getAbsenceReason() == AbsenceReason.NAVE || att.getAbsenceReason() == AbsenceReason.OTHER_CHURCH));
+        || att.getStatus() == AttendanceStatus.ALLOWED;
+
   }
 
   /**
@@ -181,6 +181,11 @@ public class AttendanceService {
         absenceReason = AbsenceReason.valueOf(absenceReasonParam);
         if (absenceReason == AbsenceReason.OTHER) {
           customReason = customReasonParam;
+        }
+
+        // ALLOWED 상태로 변경 조건
+        if (absenceReason == AbsenceReason.NAVE || absenceReason == AbsenceReason.OTHER_CHURCH) {
+          status = AttendanceStatus.ALLOWED;
         }
       }
 
