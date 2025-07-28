@@ -3,32 +3,42 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  background-color: #333;
+  background-color: #fafafa;
   display: flex;
   justify-content: space-around;
-  font-size: 20px;
-  color: white;
+  font-size: 14px;
+  color: black;
   z-index: 1000;
-  height: 55px; /* 고정 높이로 지정 (옵션) */
+  height: 55px;
 ">
   <a href="/" style="
-    color: white;
+    color: black;
     text-decoration: none;
     flex-grow: 1;
     text-align: center;
-    line-height: 55px;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-  ">홈</a>
+  ">
+    <span style="font-size: 18px;">🏠</span>
+    <span style="font-size: 12px; margin-top: 2px;">홈</span>
+  </a>
   <a href="/attendance/records" style="
-    color: white;
+    color: black;
     text-decoration: none;
     flex-grow: 1;
     text-align: center;
-    line-height: 55px;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-  ">출결내역</a>
+  ">
+    <span style="font-size: 16px;">💾</span>
+    <span style="font-size: 12px; margin-top: 2px;">출결내역</span>
+  </a>
 </nav>

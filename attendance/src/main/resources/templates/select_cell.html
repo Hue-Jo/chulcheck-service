@@ -6,6 +6,7 @@
   <title>셀 선택</title>
   <link rel="stylesheet" href="/css/select.css"/>
   <script th:inline="javascript" src="/js/select.js" defer></script>
+  <script src="/js/nav.js"></script>
 </head>
 <body>
 
@@ -13,24 +14,24 @@
 
 <div style="position: relative;">
   <h1>출석부</h1>
-  <p th:if="${!isSunday}" style="color: orangered; font-size: 1.3rem; margin-top: 5px;">
-    출석 체크는 일요일에만 가능합니다
+  <p th:if="${!isSunday}" class="warning-card">
+    출석 체크는 일요일에만 가능
+  </p>
+</div>
+
+<!-- 출석 집계 현황 -->
+<div style="margin-top: 20px; text-align: center;">
+  <p th:if="${allSubmitted}" style="font-weight: bold; font-size: 1.3rem;">
+    ☑️ 전체 출석 인원: <span th:text="${todayPresentCount}"></span>명
+  </p>
+  <p th:if="${!allSubmitted}" style="color: gray; font-style: italic;">
+    🔄 출석 집계 중 (아직 제출하지 않은 셀이 있습니다)
   </p>
 </div>
 
 <!-- 메시지 -->
 <div th:if="${success}" class="message message-success" th:text="${success}"></div>
 <div th:if="${error}" class="message message-error" th:text="${error}"></div>
-
-<!-- 출석 집계 현황 -->
-<div style="margin-top: 30px; text-align: center;">
-  <p th:if="${allSubmitted}" style="font-weight: bold; font-size: 1.1rem;">
-    전체 출석 인원: <span th:text="${todayPresentCount}"></span>명
-  </p>
-  <p th:if="${!allSubmitted}" style="color: gray; font-style: italic;">
-    🔄 출석 집계 중 (아직 제출하지 않은 셀이 있습니다)
-  </p>
-</div>
 
 <!-- 셀 테이블 -->
 <table>
