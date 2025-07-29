@@ -6,12 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>출석 내역 조회</title>
   <link rel="stylesheet" href="/css/record.css"/>
+  <link rel="stylesheet" href="/css/nav.css"/>
   <script src="/js/nav.js"></script>
 </head>
 
 <body>
 <h1>
-  <a th:href="@{/attendance/records}">📅 출석 내역 조회</a>
+  <a th:href="@{/attendance/records}">💾 출석 내역 조회</a>
 </h1>
 
 <form th:action="@{/attendance/records}" method="get" class="filter-section">
