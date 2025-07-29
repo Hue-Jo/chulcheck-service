@@ -1,5 +1,7 @@
 package smmiddle.attendance.controller;
 
+import static smmiddle.attendance.component.SessionUtil.isNotAuthenticated;
+
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,12 +22,8 @@ import smmiddle.attendance.service.AttendanceService;
 @RequiredArgsConstructor
 public class RecordController {
 
-   private final AttendanceService attendanceService;
+  private final AttendanceService attendanceService;
 
-  private boolean isNotAuthenticated(HttpSession session) {
-    Boolean authenticated = (Boolean) session.getAttribute("authenticated");
-    return authenticated == null || !authenticated;
-  }
 
   @GetMapping("/attendance/records")
   public String viewAttendanceRecords(

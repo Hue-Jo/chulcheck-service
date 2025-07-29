@@ -1,5 +1,7 @@
 package smmiddle.attendance.controller;
 
+import static smmiddle.attendance.component.SessionUtil.isNotAuthenticated;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.time.DayOfWeek;
@@ -29,11 +31,6 @@ import smmiddle.attendance.service.AttendanceService;
 public class AttendanceController {
 
   private final AttendanceService attendanceService;
-  private boolean isNotAuthenticated(HttpSession session) {
-    Boolean authenticated = (Boolean) session.getAttribute("authenticated");
-    return authenticated == null || !authenticated;
-  }
-
 
   // 첫 화면에서 셀 목록 조회
   @GetMapping("/")
@@ -44,7 +41,7 @@ public class AttendanceController {
 
     List<Cell> cells = attendanceService.getAllCells();
     LocalDate today = LocalDate.now();
-    boolean isSunday = today.getDayOfWeek() == DayOfWeek.SUNDAY; // 일요일만
+    boolean isSunday = today.getDayOfWeek() == DayOfWeek.TUESDAY; // 일요일만
 
     AllAttendanceSummaryDto summary = attendanceService.getAttendanceSummary(today);
 
