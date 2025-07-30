@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +29,7 @@ import smmiddle.attendance.service.AttendanceService;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class AttendanceController {
 
   private final AttendanceService attendanceService;
@@ -36,12 +38,13 @@ public class AttendanceController {
   @GetMapping("/")
   public String showCellSelectForm(HttpSession session, Model model) {
     if (isNotAuthenticated(session)) {
+      log.warn("비인증 사용자가 접근 시도");
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
 
     List<Cell> cells = attendanceService.getAllCells();
     LocalDate today = LocalDate.now();
-    boolean isSunday = today.getDayOfWeek() == DayOfWeek.TUESDAY; // 일요일만
+    boolean isSunday = today.getDayOfWeek() == DayOfWeek.SUNDAY; // 일요일만
 
     AllAttendanceSummaryDto summary = attendanceService.getAttendanceSummary(today);
 
@@ -56,7 +59,7 @@ public class AttendanceController {
     model.addAttribute("isSunday", isSunday);
     model.addAttribute("attendanceStatusMap", summary.getAttendanceStatusMap()); // 출석 여부 map
     model.addAttribute("allSubmitted", summary.isAllSubmitted());
-    model.addAttribute("todayPresentCount", summary.getTodayPresentCount());
+    //model.addAttribute("todayPresentCount", summary.getTodayPresentCount());
     return "select_cell";
   }
 
@@ -82,6 +85,7 @@ public class AttendanceController {
       @RequestParam Long cellId, Model model) {
 
     if (isNotAuthenticated(session)) {
+      log.warn("비인증 사용자가 접근 시도");
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
     model.addAttribute("formDto", buildFormViewDto(cellId, false));
@@ -95,6 +99,7 @@ public class AttendanceController {
       @RequestParam Long cellId, Model model) {
 
     if (isNotAuthenticated(session)) {
+      log.warn("비인증 사용자가 접근 시도");
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
 
