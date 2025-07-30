@@ -1,44 +1,14 @@
-<nav th:fragment="bottom-nav" style="
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: #fafafa;
-  display: flex;
-  justify-content: space-around;
-  font-size: 14px;
-  color: black;
-  z-index: 1000;
-  height: 55px;
-">
-  <a href="/" style="
-    color: black;
-    text-decoration: none;
-    flex-grow: 1;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  ">
-    <span style="font-size: 18px;">🏠</span>
-    <span style="font-size: 12px; margin-top: 2px;">홈</span>
+<nav th:fragment="bottom-nav" class="bottom-nav">
+  <a href="/" class="nav-item">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">홈</span>
   </a>
-  <a href="/attendance/records" style="
-    color: black;
-    text-decoration: none;
-    flex-grow: 1;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  ">
-    <span style="font-size: 16px;">💾</span>
-    <span style="font-size: 12px; margin-top: 2px;">출결내역</span>
+  <a href="/attendance/records" class="nav-item">
+    <span class="nav-icon">💾</span>
+    <span class="nav-label">출결내역</span>
+  </a>
+  <a href="/ranking" class="nav-item">
+    <span class="nav-icon">🎖️</span>
+    <span class="nav-label">개/정근</span>
   </a>
 </nav>

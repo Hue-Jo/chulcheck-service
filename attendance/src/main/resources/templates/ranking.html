@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>결석 학생 랭킹</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/css/nav.css"/>
+  <link rel="stylesheet" href="/css/rank.css">
+  <script src="/js/nav.js"></script>
+
+</head>
+
+<body>
+
+<h1>🎖️ 8-12월 개근/정근</h1>
+
+<div class="filter-buttons">
+  <button class="btn" th:classappend="${min == 0 && max == 0} ? 'active'"
+          th:onclick="|window.location.href='/ranking?min=0&max=0'|">
+    결석 0회
+  </button>
+  <button class="btn" th:classappend="${min == 1 && max == 3} ? 'active'"
+          th:onclick="|window.location.href='/ranking?min=1&max=3'|">
+    결석 1-3회
+  </button>
+</div>
+
+<table>
+  <thead>
+  <tr>
+    <th>학생명</th>
+    <th>셀</th>
+    <th>결석 횟수</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="student : ${rankingList}">
+    <td th:text="${student.studentName}"></td>
+    <td th:text="${student.cellName}"></td>
+    <td th:text="${student.absenceCount}"></td>
+  </tr>
+  </tbody>
+</table>
+
+<div class="pagination">
+  <a th:if="${currentPage > 0}" th:href="@{|/ranking?page=${currentPage - 1}&min=${min}&max=${max}|}">이전</a>
+  <span class="current" th:text="'Page ' + ${currentPage + 1} + ' / ' + ${totalPages}"></span>
+  <a th:if="${currentPage + 1 < totalPages}" th:href="@{|/ranking?page=${currentPage + 1}&min=${min}&max=${max}|}">다음</a>
+</div>
+
+<div th:replace="~{nav :: bottom-nav}"></div>
+
+</body>
+</html>

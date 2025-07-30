@@ -80,7 +80,7 @@ public class AttendanceService {
   }
 
   /**
-   * 셀별 학생들 조회
+   * 셀별(cellId) 학생들 조회
    */
   public List<Student> getAllStudentsByCellId(Long cellId) {
     if (cellId == null || cellId <= 0) {
@@ -98,14 +98,14 @@ public class AttendanceService {
   }
 
   /**
-   * 출석 체크 여부 확인
+   * 특정 셀이 특정 날짜에 출석 체크했는지 여부 확인
    */
   public boolean alreadySubmitted(Long cellId, LocalDate date) {
     return attendanceRepository.existsByStudent_Cell_IdAndDate(cellId, date);
   }
 
   /**
-   * 출석 수 계산 메서드
+   * 출석 수 계산 메서드 (출석 = PRESENT, ALLOWED)
    */
   public boolean countsAsPresent(Attendance att) {
     return att.getStatus() == AttendanceStatus.PRESENT
@@ -114,7 +114,7 @@ public class AttendanceService {
   }
 
   /**
-   * 오늘 특정 셀의 출석 학생 수 반환
+   * 특정 셀의 오늘 출석 학생 수 계산
    */
   public int getTodayPresentCount(Long cellId, LocalDate date) {
     List<Attendance> attendances = attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
@@ -128,14 +128,14 @@ public class AttendanceService {
   }
 
   /**
-   * 가장 최근 출첵한 셀
+   * 가장 최근 출첵한 셀 조회
    */
   public Optional<Attendance> getLatestAttendance() {
     return attendanceRepository.findTopByUpdatedDateIsNotNullOrderByUpdatedDateDesc();
   }
 
   /**
-   * 셀별 출석 요약정보
+   * (오늘) 출석부 제출 여부 확인
    */
   public AllAttendanceSummaryDto getAttendanceSummary(LocalDate today) {
     List<Cell> cells = getAllCells();
@@ -176,6 +176,7 @@ public class AttendanceService {
 
       if (status == AttendanceStatus.ABSENT) {
         if (absenceReasonParam == null || absenceReasonParam.isEmpty()) {
+          log.warn("학생 ID: {}의 결석 사유 누락", student.getId());
           throw new ChulCheckException(ErrorCode.INVALID_ABSENCE_REASON);
         }
         absenceReason = AbsenceReason.valueOf(absenceReasonParam);
@@ -192,6 +193,7 @@ public class AttendanceService {
       Optional<Attendance> attendanceOpt = attendanceRepository.findByStudent_IdAndDate(student.getId(), date);
 
       if (attendanceOpt.isPresent()) {
+        log.debug("출석 수정 - 학생 ID: {}, 날짜: {}", student.getId(), date);
         attendanceOpt.get().updateStatus(status, absenceReason, customReason);
         hasExisting = true;
       } else {
@@ -204,17 +206,23 @@ public class AttendanceService {
             .build();
 
         attendanceRepository.save(attendance);
+        log.debug("수정된 출석 정보 저장 - 학생 ID: {}, 출결상태: {}", student.getId(), status);
       }
     }
     log.info("출석 정보 {} 완료 - 셀 ID: {}, 날짜: {}", hasExisting ? "수정" : "제출", cellId, date);
     return hasExisting ? "수정" : "제출";
   }
 
+  /**
+   * 출석이 저장된 모든 날짜 목록 조회
+   */
   public List<LocalDate> getAllAttendanceDates() {
     return attendanceRepository.findDistinctDates();
   }
 
-  // 셀 ID + 날짜로 출석 정보 가져오기
+  /**
+   셀 ID + 날짜로 출석 정보 가져오기
+   */
   public List<Attendance> getAttendancesByCellIdAndDate(Long cellId, LocalDate date) {
     log.debug("셀 ID [{}], 날짜 [{}]의 출석 정보 조회", cellId, date);
     return attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
@@ -228,6 +236,9 @@ public class AttendanceService {
             attendance -> attendance));
   }
 
+  /**
+   * 출결정보 조회 화면의 요약본
+   */
   public List<CellAttendanceSummaryDto> getTodayCellAttendanceSummary() {
     LocalDate today = LocalDate.now();
     List<Cell> cells = cellRepository.findAll();

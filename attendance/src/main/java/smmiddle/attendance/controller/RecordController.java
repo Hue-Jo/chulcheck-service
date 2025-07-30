@@ -1,9 +1,12 @@
 package smmiddle.attendance.controller;
 
+import static smmiddle.attendance.component.SessionUtil.isNotAuthenticated;
+
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,14 +21,11 @@ import smmiddle.attendance.service.AttendanceService;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class RecordController {
 
-   private final AttendanceService attendanceService;
+  private final AttendanceService attendanceService;
 
-  private boolean isNotAuthenticated(HttpSession session) {
-    Boolean authenticated = (Boolean) session.getAttribute("authenticated");
-    return authenticated == null || !authenticated;
-  }
 
   @GetMapping("/attendance/records")
   public String viewAttendanceRecords(
@@ -35,6 +35,7 @@ public class RecordController {
       Model model) {
 
     if (isNotAuthenticated(session)) {
+      log.warn("비인증 사용자가 접근 시도");
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
 

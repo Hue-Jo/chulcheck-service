@@ -1,5 +1,7 @@
 package smmiddle.attendance.controller;
 
+import static smmiddle.attendance.component.SessionUtil.isNotAuthenticated;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.time.DayOfWeek;
@@ -9,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,19 +29,16 @@ import smmiddle.attendance.service.AttendanceService;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class AttendanceController {
 
   private final AttendanceService attendanceService;
-  private boolean isNotAuthenticated(HttpSession session) {
-    Boolean authenticated = (Boolean) session.getAttribute("authenticated");
-    return authenticated == null || !authenticated;
-  }
-
 
   // 첫 화면에서 셀 목록 조회
   @GetMapping("/")
   public String showCellSelectForm(HttpSession session, Model model) {
     if (isNotAuthenticated(session)) {
+      log.warn("비인증 사용자가 접근 시도");
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
 
@@ -59,7 +59,7 @@ public class AttendanceController {
     model.addAttribute("isSunday", isSunday);
     model.addAttribute("attendanceStatusMap", summary.getAttendanceStatusMap()); // 출석 여부 map
     model.addAttribute("allSubmitted", summary.isAllSubmitted());
-    model.addAttribute("todayPresentCount", summary.getTodayPresentCount());
+    //model.addAttribute("todayPresentCount", summary.getTodayPresentCount());
     return "select_cell";
   }
 
@@ -85,6 +85,7 @@ public class AttendanceController {
       @RequestParam Long cellId, Model model) {
 
     if (isNotAuthenticated(session)) {
+      log.warn("비인증 사용자가 접근 시도");
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
     model.addAttribute("formDto", buildFormViewDto(cellId, false));
@@ -98,6 +99,7 @@ public class AttendanceController {
       @RequestParam Long cellId, Model model) {
 
     if (isNotAuthenticated(session)) {
+      log.warn("비인증 사용자가 접근 시도");
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
 

@@ -1,34 +1,35 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>출석 인증</title>
   <link rel="stylesheet" href="/css/auth.css"/>
 </head>
 <body>
+<div class="wrapper">
+  <div class="container">
+    <h1>🔐 중등부 교사 인증</h1>
+    <p>이번달의 인증번호를 입력하세요</p>
 
-<div class="container">
-  <h1>🔐 중등부 교사 인증</h1>
-  <p>이번달의 인증번호를 입력하세요</p>
+    <div th:if="${error}" class="message message-error">
+      <p th:text="${error}"></p>
+    </div>
 
-  <div th:if="${error}" class="message message-error">
-    <p th:text="${error}"></p>
+    <form th:action="@{/auth}" method="post">
+      <input type="tel"
+             inputmode="numeric"
+             pattern="[0-9]*"
+             name="code"
+             maxlength="4"
+             placeholder="이번달의 인증번호"
+             class="code-input"
+             required/>
+      <br/>
+      <button type="submit">확인</button>
+    </form>
   </div>
-
-  <form th:action="@{/auth}" method="post">
-    <input type="tel"
-           inputmode="numeric"
-           pattern="[0-9]*"
-           name="code"
-           maxlength="4"
-           placeholder="이번달의 인증번호"
-           class="code-input"
-           required />
-    <br />
-    <button type="submit">확인</button>
-  </form>
+  <div th:replace="~{/footer :: footer}"></div>
 </div>
-
 </body>
 </html>

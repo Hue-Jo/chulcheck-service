@@ -1,6 +1,7 @@
 package smmiddle.attendance.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import smmiddle.attendance.entity.Cell;
@@ -12,6 +13,7 @@ import smmiddle.attendance.repository.StudentRepository;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StudentService {
   private final StudentRepository studentRepository;
   private final CellRepository cellRepository;
@@ -30,6 +32,7 @@ public class StudentService {
         .build();
 
     studentRepository.save(student);
+    log.info("새 친구 저장 완료: 이름 = {}, 셀 = {}", student.getName(), cell.getName());
   }
 
 }
