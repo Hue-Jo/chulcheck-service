@@ -13,7 +13,7 @@ import smmiddle.attendance.repository.StudentRepository;
 @RequiredArgsConstructor
 public class RankingService {
   private final StudentRepository studentRepository;
-  private static final LocalDate START_DATE = LocalDate.of(2025, 7, 1);
+  private static final LocalDate START_DATE = LocalDate.of(2025, 8, 1);
   private static final LocalDate END_DATE = LocalDate.of(2025, 12, 31);
   private static final int PAGE_SIZE = 10;
 
