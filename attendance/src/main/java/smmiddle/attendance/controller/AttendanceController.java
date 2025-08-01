@@ -6,10 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,9 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import smmiddle.attendance.constant.AbsenceReason;
 import smmiddle.attendance.dto.AllAttendanceSummaryDto;
 import smmiddle.attendance.dto.AttendanceFormViewDto;
-import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
-import smmiddle.attendance.entity.Student;
 import smmiddle.attendance.service.AttendanceService;
 
 @Controller

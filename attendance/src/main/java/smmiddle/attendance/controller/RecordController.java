@@ -12,8 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import smmiddle.attendance.constant.AbsenceReason;
-import smmiddle.attendance.constant.AttendanceStatus;
 import smmiddle.attendance.dto.CellAttendanceSummaryDto;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
