@@ -55,7 +55,7 @@ public class AttendanceController {
     model.addAttribute("isSunday", isSunday);
     model.addAttribute("attendanceStatusMap", summary.getAttendanceStatusMap()); // 출석 여부 map
     model.addAttribute("allSubmitted", summary.isAllSubmitted());
-    //model.addAttribute("todayPresentCount", summary.getTodayPresentCount());
+    model.addAttribute("todayPresentCount", summary.getTodayPresentCount()); // 모든 교사가 출석부 제출시 오늘의 총 출석수 조회
     return "select_cell";
   }
 
