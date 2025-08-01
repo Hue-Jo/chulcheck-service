@@ -26,9 +26,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
           LEFT JOIN s.attendances a
             ON a.status = 'ABSENT'
            AND a.date BETWEEN :startDate AND :endDate
-          GROUP BY s.id
+          GROUP BY s.id, s.name, s.cell.name, s.cell.id
           HAVING COUNT(a) BETWEEN :minAbsence AND :maxAbsence
-          ORDER BY COUNT(a) ASC
+          ORDER BY COUNT(a) ASC, s.cell.id DESC
       """)
   Page<RankingDto> findByAbsenceCountBetween(
       @Param("startDate") LocalDate startDate,
