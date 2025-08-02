@@ -12,8 +12,6 @@
 </head>
 <body>
 
-<button id="scrollToBottomBtn" class="scroll-down-btn">⬇</button>
-
 <div style="position: relative;">
   <h1>🏠 출석부</h1>
   <p th:if="${!isSunday}" class="warning-card">
@@ -31,39 +29,56 @@
   </p>
 </div>
 
+<div class="cell-grid">
+  <form th:each="cell : ${cells}"
+        th:action="${attendanceStatusMap[cell.id]} ? @{/attendance/edit} : @{/attendance/form}"
+        method="get"
+        class="cell-grid-item"
+        th:classappend="${attendanceStatusMap[cell.id]} ? 'submitted' : 'pending'">
+    <input type="hidden" name="cellId" th:value="${cell.id}"/>
+    <button type="submit" th:disabled="${!isSunday}">
+      <span>
+        <span th:text="${cell.name}"></span>
+        <span th:if="${attendanceStatusMap[cell.id]}" style="margin-left: 4px;">✅</span>
+      </span>
+    </button>
+  </form>
+</div>
+
 <!-- 메시지 -->
 <div th:if="${success}" class="message message-success" th:text="${success}"></div>
 <div th:if="${error}" class="message message-error" th:text="${error}"></div>
 
-<!-- 셀 테이블 -->
-<table>
-  <thead>
-  <tr>
-    <th>셀</th>
-    <th>교사</th>
-    <th>제출 여부</th>
-    <th></th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr th:each="cell : ${cells}">
-    <td th:text="${cell.name}">셀 이름</td>
-    <td th:text="${cell.teacher}">교사 이름</td>
-    <td th:text="${attendanceStatusMap[cell.id] ? '✅' : '❌'}"
-        th:classappend="${attendanceStatusMap[cell.id]} ? 'status-submitted' : 'status-pending'"></td>
-    <td>
-      <form th:if="${!attendanceStatusMap[cell.id]}" th:action="@{/attendance/form}" method="get">
-        <input type="hidden" name="cellId" th:value="${cell.id}"/>
-        <button type="submit" class="btn btn-submit" th:disabled="${!isSunday}">출석</button>
-      </form>
-      <form th:if="${attendanceStatusMap[cell.id]}" th:action="@{/attendance/edit}" method="get">
-        <input type="hidden" name="cellId" th:value="${cell.id}"/>
-        <button type="submit" class="btn btn-edit" th:disabled="${!isSunday}">수정</button>
-      </form>
-    </td>
-  </tr>
-  </tbody>
-</table>
+<!--&lt;!&ndash; 셀 테이블 &ndash;&gt;-->
+<!--<table>-->
+<!--  <thead>-->
+<!--  <tr>-->
+<!--    <th>셀</th>-->
+<!--    <th>교사</th>-->
+<!--    <th>제출 여부</th>-->
+<!--    <th></th>-->
+<!--  </tr>-->
+<!--  </thead>-->
+<!--  <tbody>-->
+<!--  <tr th:each="cell : ${cells}">-->
+<!--    <td th:text="${cell.name}">셀 이름</td>-->
+<!--    <td th:text="${cell.teacher}">교사 이름</td>-->
+<!--    <td th:text="${attendanceStatusMap[cell.id] ? '✅' : '❌'}"-->
+<!--        th:classappend="${attendanceStatusMap[cell.id]} ? 'status-submitted' : 'status-pending'"></td>-->
+<!--    <td>-->
+<!--      <form th:if="${!attendanceStatusMap[cell.id]}" th:action="@{/attendance/form}" method="get">-->
+<!--        <input type="hidden" name="cellId" th:value="${cell.id}"/>-->
+<!--        <button type="submit" class="btn btn-submit" th:disabled="${!isSunday}">출석</button>-->
+<!--      </form>-->
+<!--      <form th:if="${attendanceStatusMap[cell.id]}" th:action="@{/attendance/edit}" method="get">-->
+<!--        <input type="hidden" name="cellId" th:value="${cell.id}"/>-->
+<!--        <button type="submit" class="btn btn-edit" th:disabled="${!isSunday}">수정</button>-->
+<!--      </form>-->
+<!--    </td>-->
+<!--  </tr>-->
+<!--  </tbody>-->
+<!--</table>-->
+
 
 <!-- 최근 수정시간 -->
 <div th:if="${lastUpdatedTime != null and isSunday}" style="text-align: center; margin-top: 10px;">
@@ -73,13 +88,6 @@
     (<span th:text="${lastUpdatedCellName}"></span>)
   </p>
 </div>
-
-<!-- 출결 내역 버튼 -->
-<!--<div class="records-btn-container">-->
-<!--  <form th:action="@{/attendance/records}" method="get">-->
-<!--    <button type="submit" class="btn btn-submit">📋 셀별 출결 내역</button>-->
-<!--  </form>-->
-<!--</div>-->
 
 <!-- 예외 모달 -->
 <div id="errorModal" style="display: none; position: fixed; top: 0; left: 0;

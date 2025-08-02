@@ -23,6 +23,7 @@ public class StudentService {
    */
   @Transactional
   public void addNewStudent(Long cellId, String newStudentName) {
+    log.info("새 친구 등록 요청: 셀 Id = {}, 이름 = {}", cellId, newStudentName);
     Cell cell = cellRepository.findById(cellId)
         .orElseThrow(() -> new ChulCheckException(ErrorCode.CELL_NOT_FOUND));
 

@@ -67,23 +67,6 @@ p {
   cursor: not-allowed;
 }
 
-.scroll-down-btn {
-  position: fixed;
-  bottom: 60px;
-  right: 20px;
-  z-index: 1000;
-  background-color: rgba(50, 50, 50, 0.8); /* 회색끼 도는 투명 배경 */
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  font-size: 1.5rem;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  transition: background-color 0.3s ease;
-}
-
 /* 메시지 */
 .message {
   position: fixed;
@@ -124,35 +107,6 @@ p {
   border: 1px solid #f5c6cb;
 }
 
-/* 테이블 */
-table {
-  border-collapse: collapse;
-  width: 100%;
-  margin-top: 30px;
-  margin-bottom: 20px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 0 8px rgb(0 0 0 / 0.05);
-  overflow: hidden;
-}
-
-th, td {
-  padding: 12px 15px;
-  text-align: center;
-  font-size: 1.125rem;
-  border-bottom: 1px solid #eee;
-}
-
-th {
-  background-color: #f4f6f8;
-  font-weight: 700;
-  color: #4a4a4a;
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
 .status-submitted {
   color: #2e7d32;
   font-weight: 700;
@@ -165,7 +119,42 @@ tr:last-child td {
   font-size: 1.2em;
 }
 
-/*.records-btn-container {*/
-/*  text-align: center;*/
-/*  margin-top: 40px;*/
-/*}*/
+.cell-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.cell-grid-item {
+  text-align: center;
+}
+
+.cell-grid-item button {
+  width: 100%;
+  padding: 15px 10px;
+  background-color: white;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #333;
+}
+
+.cell-grid-item.submitted button {
+  border-color: #2e7d32;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* 기본 회색 버튼 */
+.cell-grid-item.pending button {
+  border-color: #ccc;
+  background-color: #f8f8f8;
+  color: #666;
+}
