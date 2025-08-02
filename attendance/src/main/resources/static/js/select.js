@@ -1,6 +1,3 @@
-document.getElementById("scrollToBottomBtn").addEventListener("click", () => {
-  window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
-});
 
 document.addEventListener('DOMContentLoaded', () => {
   const messages = document.querySelectorAll(
