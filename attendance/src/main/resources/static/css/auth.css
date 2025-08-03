@@ -17,7 +17,7 @@ body {
 
 h1 {
   font-size: 1.8rem;
-  margin-bottom: 24px; /* 여백 넉넉하게 */
+  margin-bottom: 24px;
   color: #2c3e50;
 }
 
@@ -29,13 +29,12 @@ p {
 
 input.code-input {
   width: 240px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   padding: 15px;
   font-size: 1.3rem;
   border: 1px solid #ccc;
   border-radius: 8px;
   text-align: center;
-  transition: border-color 0.2s ease;
 }
 
 button[type="submit"] {
@@ -46,20 +45,25 @@ button[type="submit"] {
   border-radius: 6px;
   font-size: 1.1rem;
   font-weight: 600;
+  display: block;
+  margin: 0 auto;
+  width: 100px;
   cursor: pointer;
-  transition: background-color 0.25s ease;
-}
-
-button[type="submit"]:hover:not(:disabled) {
-  background-color: #303f9f;
 }
 
 .message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 15px;
   padding: 5px;
   border-radius: 6px;
   font-size: 1rem;
   font-weight: bold;
+}
+
+.message p {
+  margin: 15px;
 }
 
 .message-error {

@@ -18,19 +18,22 @@
     </div>
 
     <form th:action="@{/auth}" method="post">
-      <input type="tel"
-             inputmode="numeric"
-             pattern="[0-9]*"
-             name="code"
-             maxlength="4"
-             placeholder="이번달의 인증번호"
-             class="code-input"
-             required/>
-      <br/>
+      <input
+          type="tel"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          name="code"
+          maxlength="4"
+          placeholder="이번달의 인증번호"
+          class="code-input"
+          required
+      />
       <button type="submit">확인</button>
     </form>
   </div>
+
   <div th:replace="~{footer :: footer}"></div>
+
 </div>
 </body>
 </html>
