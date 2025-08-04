@@ -6,6 +6,8 @@
   <meta name="robots" content="noindex, nofollow">
   <title>출석 인증</title>
   <link rel="stylesheet" href="/css/auth.css"/>
+  <link rel="stylesheet" href="/css/verses.css">
+  <script src="/js/verses.js"></script>
 </head>
 <body>
 <div class="wrapper">
@@ -18,19 +20,24 @@
     </div>
 
     <form th:action="@{/auth}" method="post">
-      <input type="tel"
-             inputmode="numeric"
-             pattern="[0-9]*"
-             name="code"
-             maxlength="4"
-             placeholder="이번달의 인증번호"
-             class="code-input"
-             required/>
-      <br/>
+      <input
+          type="tel"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          name="code"
+          maxlength="4"
+          placeholder="이번달의 인증번호"
+          class="code-input"
+          required
+      />
       <button type="submit">확인</button>
     </form>
   </div>
+
+  <div id="verse" class="verse-box"></div>
+
   <div th:replace="~{footer :: footer}"></div>
+
 </div>
 </body>
 </html>
