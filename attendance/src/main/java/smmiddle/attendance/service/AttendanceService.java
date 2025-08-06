@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import smmiddle.attendance.constant.AbsenceReason;
 import smmiddle.attendance.constant.AttendanceStatus;
 import smmiddle.attendance.dto.AllAttendanceSummaryDto;
 import smmiddle.attendance.dto.CellAttendanceSummaryDto;
+import smmiddle.attendance.dto.RecordDto;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
@@ -59,23 +61,6 @@ public class AttendanceService {
         .orElseThrow(() -> {
           log.warn("셀 ID [{}]에 해당하는 셀이 존재하지 않습니다.", cellId);
           return new ChulCheckException(ErrorCode.CELL_NOT_FOUND);
-        });
-  }
-
-  /**
-   * cellId로 셀 이름 조회
-   */
-  public String getCellNameById(Long cellId) {
-    if (cellId == null || cellId <= 0) {
-      log.warn("잘못된 셀 ID: {}", cellId);
-      throw new ChulCheckException(ErrorCode.INVALID_CELL_ID);
-    }
-
-    return cellRepository.findById(cellId)
-        .map(Cell::getName)
-        .orElseThrow(() -> {
-          log.warn("셀 ID [{}]에 해당하는 셀이 존재하지 않습니다.", cellId);
-          throw new ChulCheckException(ErrorCode.CELL_NOT_FOUND);
         });
   }
 
@@ -219,6 +204,25 @@ public class AttendanceService {
   public List<LocalDate> getAllAttendanceDates() {
     return attendanceRepository.findDistinctDates();
   }
+
+  /**
+   * 특정 날짜의 모든 셀의 출결사항 조회 & 각 셀의 총 출석수 조회
+   */
+  public Map<Cell, RecordDto> getAllCellsAttendanceByDateWithCount(LocalDate date) {
+    List<Cell> cells = cellRepository.findAll();
+    Map<Cell, RecordDto> result = new LinkedHashMap<>();
+
+    for (Cell cell : cells) {
+      List<Attendance> attList = getAttendancesByCellIdAndDate(cell.getId(), date);
+      long presentCount = attList.stream()
+          .filter(this::countsAsPresent)
+          .count();
+      result.put(cell, new RecordDto(attList, presentCount));
+    }
+
+    return result;
+  }
+
 
   /**
    셀 ID + 날짜로 출석 정보 가져오기

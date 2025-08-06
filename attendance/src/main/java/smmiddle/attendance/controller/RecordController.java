@@ -5,6 +5,7 @@ import static smmiddle.attendance.component.SessionUtil.isNotAuthenticated;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import smmiddle.attendance.dto.CellAttendanceSummaryDto;
+import smmiddle.attendance.dto.RecordDto;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.service.AttendanceService;
@@ -28,7 +30,7 @@ public class RecordController {
   @GetMapping("/attendance/records")
   public String viewAttendanceRecords(
       HttpSession session,
-      @RequestParam(name = "cellId", required = false) Long cellId,
+      //@RequestParam(name = "cellId", required = false) Long cellId,
       @RequestParam(name = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
       Model model) {
 
@@ -46,24 +48,14 @@ public class RecordController {
     model.addAttribute("dates", attendanceDates);
 
     // 날짜 또는 셀이 선택되지 않은 경우, 전체 셀 출결 요약
-    if (cellId == null || cellId == 0 || date == null) {
+    if (date == null) {
       List<CellAttendanceSummaryDto> summaryList = attendanceService.getTodayCellAttendanceSummary();
       model.addAttribute("summaryList", summaryList);
       return "attendance_records";
     }
 
-    // 출석 기록 조회
-    List<Attendance> attendances = attendanceService.getAttendancesByCellIdAndDate(cellId, date);
-    int presentCount = (int) attendances.stream()
-        .filter(attendanceService::countsAsPresent)
-        .count();
-
-    // 셀 이름 (선택한 셀 ID로 조회)
-    String selectedCellName = attendanceService.getCellNameById(cellId);
-
-    model.addAttribute("attendances", attendances);
-    model.addAttribute("presentCount", presentCount);
-    model.addAttribute("selectedCellName", selectedCellName);
+    Map<Cell, RecordDto> cellAttendanceMap = attendanceService.getAllCellsAttendanceByDateWithCount(date);
+    model.addAttribute("cellAttendanceMap", cellAttendanceMap);
     model.addAttribute("selectedDate", date.toString());
 
     return "attendance_records";
