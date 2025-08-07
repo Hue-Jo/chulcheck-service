@@ -107,18 +107,6 @@ p {
   border: 1px solid #f5c6cb;
 }
 
-.status-submitted {
-  color: #2e7d32;
-  font-weight: 700;
-  font-size: 1.2rem;
-}
-
-.status-pending {
-  color: #c62828;
-  font-weight: 700;
-  font-size: 1.2em;
-}
-
 .cell-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
