@@ -20,11 +20,8 @@ p {
   color: #555;
 }
 
-.active-nav span:first-child {
-  filter: drop-shadow(0 0 3px black);
-}
-
-.warning-card {
+/* 요일 제한 */
+.not-sunday {
   background-color: #fff4f4;
   border: 2px solid orangered;
   border-radius: 10px;

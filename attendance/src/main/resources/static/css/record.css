@@ -30,10 +30,6 @@ h1 a {
   color: inherit;
 }
 
-.active-nav span:first-child {
-  filter: drop-shadow(0 0 3px black);
-}
-
 .filter-section {
   display: flex;
   flex-direction: column;
