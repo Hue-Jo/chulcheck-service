@@ -45,9 +45,10 @@
   </form>
 </div>
 
-<!-- 메시지 -->
+<!-- 토스트 메시지 -->
 <div th:if="${success}" class="message message-success" th:text="${success}"></div>
 <div th:if="${error}" class="message message-error" th:text="${error}"></div>
+<div th:if="${chulcheckErrorMessage}" class="message exception-error" th:text="${chulcheckErrorMessage}"></div>
 
 <!-- 최근 수정시간 -->
 <div th:if="${lastUpdatedTime != null and isSunday}" style="text-align: center; margin-top: 10px;">

@@ -74,7 +74,7 @@ p {
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
-  padding: 33px 40px;
+  padding: 35px 40px;
   border-radius: 8px;
   font-weight: 500;
   font-size: 1.2rem;
@@ -101,7 +101,7 @@ p {
   border: 1px solid #a2e1db;
 }
 
-.message-error {
+.message-error, .exception-error {
   background-color: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
