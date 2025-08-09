@@ -1,6 +1,6 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 30px 30px 80px;
+  margin: 30px;
   background: #fafafa;
   color: #333;
 }
@@ -17,6 +17,10 @@ h1 {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+}
+
+.cell-info {
+  margin-bottom: 10px;
 }
 
 .add-btn {
@@ -83,11 +87,10 @@ input[type="radio"] {
   font-size: 1rem;
   cursor: pointer;
   transition: border-color 0.3s, color 0.3s;
-  user-select: none;
-  display: inline-block;
+  /*user-select: none;*/
+  /*display: inline-block;*/
   text-align: center;
   min-width: 50px;
-  background-color: transparent;
 }
 
 .attendance-buttons input[type="radio"]:checked + label.present-label {
@@ -99,18 +102,6 @@ input[type="radio"] {
 
 .attendance-buttons input[type="radio"]:checked + label.absent-label {
   background-color: #ffebee;
-  color: #7f2a2a !important;
-  border-color: #f44336 !important;
-  font-weight: 700;
-}
-
-.attendance-buttons input[type="radio"]:checked + label.present-label {
-  color: #1b4d1b !important;
-  border-color: #4caf50 !important;
-  font-weight: 700;
-}
-
-.attendance-buttons input[type="radio"]:checked + label.absent-label {
   color: #7f2a2a !important;
   border-color: #f44336 !important;
   font-weight: 700;
@@ -131,7 +122,11 @@ input[type="radio"] {
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 1rem;
-  box-sizing: border-box;
+  /*box-sizing: border-box;*/
+}
+
+.custom-reason-input {
+  display: none;
 }
 
 button[type="submit"] {
@@ -151,7 +146,7 @@ button[type="submit"] {
 
 @media (max-width: 480px) {
   .student-card {
-    padding: 12px 12px;
+    padding: 12px;
   }
 
   .student-name {
@@ -166,7 +161,7 @@ button[type="submit"] {
   }
 }
 
-#studentModal {
+.modal {
   display: none;
   position: fixed;
   z-index: 999;
@@ -218,7 +213,6 @@ button[type="submit"] {
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
-  font-size: 1rem;
 }
 
 /* 토스트 스타일 */

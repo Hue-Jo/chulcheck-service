@@ -15,12 +15,12 @@
   <button class="add-btn" type="button" onclick="openStudentModal()">➕ 새 친구</button>
 </div>
 
-<div style="margin-bottom: 10px;">
+<section class="cell-info">
   <p><strong>담당 셀 :</strong> <span th:text="${formDto.cell.name}"></span></p>
-  <p><strong>담당 교사:</strong> <span th:text="${formDto.cell.teacher}"></span></p>
-  <p><strong>출석 날짜:</strong> <span th:text="${#temporals.format(formDto.today, 'yyyy-MM-dd')}"></span></p>
-</div>
-
+  <p><strong>담당 교사 :</strong> <span th:text="${formDto.cell.teacher}"></span></p>
+  <p><strong>출석 날짜 :</strong> <span
+      th:text="${#temporals.format(formDto.today, 'yyyy-MM-dd')}"></span></p>
+</section>
 <div class="section-divider"></div>
 
 <form th:action="@{/attendance/submit}" method="post">
@@ -33,45 +33,47 @@
 
       <div class="attendance-buttons">
         <input type="radio"
-               th:id="'present_' + ${student.id}"
-               th:name="'status_' + ${student.id}"
-               th:value="'PRESENT'"
+               th:id="|present_${student.id}|"
+               th:name="|status_${student.id}|"
+               value="PRESENT"
                class="present"
-               th:checked="${formDto.attendanceMap == null or formDto.attendanceMap[student.id] == null or formDto.attendanceMap[student.id]?.status?.name() == 'PRESENT'}"
-               th:onclick="'toggleReasonInput(' + ${student.id} + ')'"/>
+               th:checked="${formDto.attendanceMap == null
+                            or formDto.attendanceMap[student.id] == null
+                            or formDto.attendanceMap[student.id]?.status?.name() == 'PRESENT'}"
+               th:onclick="|toggleReasonInput(${student.id})|"/>
         <label th:for="'present_' + ${student.id}" class="present-label">출석</label>
 
         <input type="radio"
-               th:id="'absent_' + ${student.id}"
-               th:name="'status_' + ${student.id}"
-               th:value="'ABSENT'"
+               th:id="|absent_${student.id}|"
+               th:name="|status_${student.id}|"
+               value="ABSENT"
                class="absent"
-               th:checked="${formDto.attendanceMap != null and (formDto.attendanceMap[student.id]?.status?.name() == 'ABSENT' or formDto.attendanceMap[student.id]?.status?.name() == 'ALLOWED')}"
-               th:onclick="'toggleReasonInput(' + ${student.id} + ')'"/>
-        <label th:for="'absent_' + ${student.id}" class="absent-label">결석</label>
+               th:checked="${formDto.attendanceMap != null
+                            and (formDto.attendanceMap[student.id]?.status?.name() == 'ABSENT'
+                                 or formDto.attendanceMap[student.id]?.status?.name() == 'ALLOWED')}"
+               th:onclick="|toggleReasonInput(${student.id})|"/>
+        <label th:for="|absent_${student.id}|" class="absent-label">결석</label>
       </div>
 
-      <div class="reason-section" th:id="'reasonSection_' + ${student.id}">
-        <select
-            th:name="'absenceReason_' + ${student.id}"
-            th:id="'reasonSelect_' + ${student.id}"
-            th:onchange="'toggleCustomReason(' + ${student.id} + ')'"
-            required>
+      <div class="reason-section" th:id="|reasonSection_${student.id}|">
+        <select th:name="|absenceReason_${student.id}|"
+                th:id="|reasonSelect_${student.id}|"
+                th:onchange="|toggleCustomReason(${student.id})|"
+                required>
           <option value="" disabled selected>선택</option>
-          <option
-              th:each="reason : ${formDto.absenceReasons}"
-              th:value="${reason.name()}"
-              th:selected="${formDto.attendanceMap[student.id]?.absenceReason?.name() == reason.name()}"
-              th:text="${reason.displayName}"
-          >사유</option>
+          <option th:each="reason : ${formDto.absenceReasons}"
+                  th:value="${reason.name()}"
+                  th:selected="${formDto.attendanceMap[student.id]?.absenceReason?.name() == reason.name()}"
+                  th:text="${reason.displayName}">
+          </option>
         </select>
 
         <input type="text"
-               th:name="'customReason_' + ${student.id}"
-               th:id="'customReason_' + ${student.id}"
+               th:name="|customReason_${student.id}|"
+               th:id="|customReason_${student.id}|"
                th:value="${formDto.attendanceMap[student.id]?.customReason}"
                placeholder="기타 사유 입력"
-               style="display:none;"/>
+               class="custom-reason-input"/>
       </div>
     </div>
   </div>
@@ -80,15 +82,13 @@
 
 </form>
 <!--친구추가 모달-->
-<div id="studentModal" style="display:none;">
+<div id="studentModal" class="modal">
   <div class="modal-content">
-    <!-- 오른쪽 상단 X 버튼 -->
     <button class="close-btn" onclick="closeStudentModal()" aria-label="닫기">&times;</button>
-    <h2 style="margin-top: 0;">새 친구 등록</h2>
+    <h2>새 친구 등록</h2>
     <form id="addStudentForm">
       <input type="hidden" name="cellId" th:value="${formDto.cell.id}"/>
-      <input type="text" name="studentName" placeholder="이름" required
-             style="margin-top: 10px; margin-bottom: 2px;"/>
+      <input type="text" name="studentName" placeholder="이름" required/>
       <div class="modal-buttons">
         <button type="submit" class="submit-btn">등록</button>
         <p>⚠️ 새 친구를 등록하면 화면이 새로고침되어<br/>기존에 체크했던 출결사항이<br/>초기화될 수 있습니다.</p>
