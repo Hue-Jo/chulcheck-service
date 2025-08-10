@@ -3,6 +3,7 @@ package smmiddle.attendance.controller;
 import static smmiddle.attendance.component.SessionUtil.isNotAuthenticated;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -78,12 +79,29 @@ public class AttendanceController {
   @GetMapping("/attendance/form")
   public String showAttendanceForm(
       HttpSession session,
-      @RequestParam Long cellId, Model model) {
+      @RequestParam Long cellId,
+      Model model,
+      RedirectAttributes redirectAttributes,
+      HttpServletResponse response) {
 
     if (isNotAuthenticated(session)) {
       log.warn("비인증 사용자가 접근 시도");
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
+
+    // 캐시 방지 헤더
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+
+    LocalDate today = LocalDate.now();
+
+    boolean submitted = attendanceService.alreadySubmitted(cellId, today);
+    if (submitted) {
+      redirectAttributes.addFlashAttribute("warning", "⚠️ 이미 제출되었습니다.");
+      return "redirect:/";  // 셀 선택 페이지로 돌아가기
+    }
+
     model.addAttribute("formDto", buildFormViewDto(cellId, false));
     return "attendance_form";
   }

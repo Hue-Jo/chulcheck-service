@@ -78,7 +78,7 @@
     </div>
   </div>
 
-  <button type="submit">출결사항 제출</button>
+  <button type="submit" th:text="${formDto.isEdit} ? '출결사항 수정' : '출결사항 제출'"></button>
 
 </form>
 <!--친구추가 모달-->
