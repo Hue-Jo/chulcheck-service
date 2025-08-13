@@ -63,10 +63,6 @@ button[type="submit"] {
   padding: 10px 20px;
 }
 
-button[type="submit"]:hover {
-  background-color: var(--hover);
-}
-
 hr {
   border: none;
   border-top: 1px solid #ddd;
@@ -107,11 +103,18 @@ th {
   font-size: 1.1rem;
 }
 
+.no-attendance {
+  font-style: italic;
+}
+
 .summary-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+}
+.summary-header h3 {
+  margin: 0;
 }
 
 .scroll-button {
@@ -142,7 +145,7 @@ th {
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch; /* iOS 터치 부드럽게 */
+  -webkit-overflow-scrolling: touch;
   gap: 15px;
   padding: 10px 0;
 }
