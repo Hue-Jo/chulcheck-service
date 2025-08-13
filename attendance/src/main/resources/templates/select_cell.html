@@ -12,7 +12,7 @@
 </head>
 <body>
 
-<div style="position: relative;">
+<div style="text-align:center;">
   <h1>🏠 출석부</h1>
   <p th:if="${!isSunday}" class="not-sunday">
     출석 체크는 일요일에만 가능
@@ -20,7 +20,7 @@
 </div>
 
 <!-- 출석 집계 현황 -->
-<div style="margin-top: 20px; text-align: center;">
+<div style="margin-top: 8px; text-align: center;">
   <p th:if="${allSubmitted}" style="font-weight: bold; font-size: 1.3rem;">
     ☑️ 전체 출석 인원: <span th:text="${todayPresentCount}"></span>명
   </p>
@@ -51,7 +51,7 @@
 <div th:if="${chulcheckErrorMessage}" class="message exception-error" th:text="${chulcheckErrorMessage}"></div>
 
 <!-- 최근 수정시간 -->
-<div th:if="${lastUpdatedTime != null and isSunday}" style="text-align: center; margin-top: 10px;">
+<div th:if="${lastUpdatedTime != null and isSunday}" style="text-align: center; margin-top: 30px;">
   <p>
     🕓 마지막 수정:
     <span th:text="${#temporals.format(lastUpdatedTime, 'yyyy-MM-dd HH:mm')}"></span>
