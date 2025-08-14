@@ -2,24 +2,32 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #fafafa;
   color: #333;
-  margin: 30px auto  80px;
+  margin: 20px auto  80px;
   max-width: 900px;
   padding: 0 20px;
 }
 
-h1 {
+.title-container {
   text-align: center;
+  margin-bottom: 10px;
+}
+
+.title-container h1 {
   color: #2c3e50;
-  margin-bottom: 15px;
   padding-bottom: 8px;
   border-bottom: 3px solid #2c3e50;
   display: inline-block;
 }
 
+.title-container h1 a {
+  text-decoration: none;
+  color: inherit;
+}
+
 p {
   text-align: center;
   font-size: 1rem;
-  margin-top: 5px;
+  margin-top: 1px;
   color: #555;
 }
 
