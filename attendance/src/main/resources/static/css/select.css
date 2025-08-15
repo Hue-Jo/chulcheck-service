@@ -2,29 +2,37 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #fafafa;
   color: #333;
-  margin: 30px auto  80px;
+  margin: 20px auto  80px;
   max-width: 900px;
   padding: 0 20px;
 }
 
-h1 {
+.title-container {
   text-align: center;
+  margin-bottom: 10px;
+}
+
+.title-container h1 {
   color: #2c3e50;
-  margin-bottom: 30px;
+  padding-bottom: 8px;
+  border-bottom: 3px solid #2c3e50;
+  display: inline-block;
+}
+
+.title-container h1 a {
+  text-decoration: none;
+  color: inherit;
 }
 
 p {
   text-align: center;
   font-size: 1rem;
-  margin-top: 5px;
+  margin-top: 1px;
   color: #555;
 }
 
-.active-nav span:first-child {
-  filter: drop-shadow(0 0 3px black);
-}
-
-.warning-card {
+/* 요일 제한 */
+.not-sunday {
   background-color: #fff4f4;
   border: 2px solid orangered;
   border-radius: 10px;
@@ -74,7 +82,7 @@ p {
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
-  padding: 33px 40px;
+  padding: 35px 40px;
   border-radius: 8px;
   font-weight: 500;
   font-size: 1.2rem;
@@ -101,22 +109,10 @@ p {
   border: 1px solid #a2e1db;
 }
 
-.message-error {
+.message-error, .exception-error {
   background-color: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
-}
-
-.status-submitted {
-  color: #2e7d32;
-  font-weight: 700;
-  font-size: 1.2rem;
-}
-
-.status-pending {
-  color: #c62828;
-  font-weight: 700;
-  font-size: 1.2em;
 }
 
 .cell-grid {

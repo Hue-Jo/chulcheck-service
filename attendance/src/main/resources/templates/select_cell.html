@@ -12,15 +12,15 @@
 </head>
 <body>
 
-<div style="position: relative;">
+<div class="title-container">
   <h1>🏠 출석부</h1>
-  <p th:if="${!isSunday}" class="warning-card">
+  <p th:if="${!isSunday}" class="not-sunday">
     출석 체크는 일요일에만 가능
   </p>
 </div>
 
 <!-- 출석 집계 현황 -->
-<div style="margin-top: 20px; text-align: center;">
+<div style="margin-top: 8px; text-align: center;">
   <p th:if="${allSubmitted}" style="font-weight: bold; font-size: 1.3rem;">
     ☑️ 전체 출석 인원: <span th:text="${todayPresentCount}"></span>명
   </p>
@@ -45,57 +45,18 @@
   </form>
 </div>
 
-<!-- 메시지 -->
+<!-- 토스트 메시지 -->
 <div th:if="${success}" class="message message-success" th:text="${success}"></div>
 <div th:if="${error}" class="message message-error" th:text="${error}"></div>
-
-<!--&lt;!&ndash; 셀 테이블 &ndash;&gt;-->
-<!--<table>-->
-<!--  <thead>-->
-<!--  <tr>-->
-<!--    <th>셀</th>-->
-<!--    <th>교사</th>-->
-<!--    <th>제출 여부</th>-->
-<!--    <th></th>-->
-<!--  </tr>-->
-<!--  </thead>-->
-<!--  <tbody>-->
-<!--  <tr th:each="cell : ${cells}">-->
-<!--    <td th:text="${cell.name}">셀 이름</td>-->
-<!--    <td th:text="${cell.teacher}">교사 이름</td>-->
-<!--    <td th:text="${attendanceStatusMap[cell.id] ? '✅' : '❌'}"-->
-<!--        th:classappend="${attendanceStatusMap[cell.id]} ? 'status-submitted' : 'status-pending'"></td>-->
-<!--    <td>-->
-<!--      <form th:if="${!attendanceStatusMap[cell.id]}" th:action="@{/attendance/form}" method="get">-->
-<!--        <input type="hidden" name="cellId" th:value="${cell.id}"/>-->
-<!--        <button type="submit" class="btn btn-submit" th:disabled="${!isSunday}">출석</button>-->
-<!--      </form>-->
-<!--      <form th:if="${attendanceStatusMap[cell.id]}" th:action="@{/attendance/edit}" method="get">-->
-<!--        <input type="hidden" name="cellId" th:value="${cell.id}"/>-->
-<!--        <button type="submit" class="btn btn-edit" th:disabled="${!isSunday}">수정</button>-->
-<!--      </form>-->
-<!--    </td>-->
-<!--  </tr>-->
-<!--  </tbody>-->
-<!--</table>-->
-
+<div th:if="${chulcheckErrorMessage}" class="message exception-error" th:text="${chulcheckErrorMessage}"></div>
 
 <!-- 최근 수정시간 -->
-<div th:if="${lastUpdatedTime != null and isSunday}" style="text-align: center; margin-top: 10px;">
+<div th:if="${lastUpdatedTime != null and isSunday}" style="text-align: center; margin-top: 30px;">
   <p>
     🕓 마지막 수정:
     <span th:text="${#temporals.format(lastUpdatedTime, 'yyyy-MM-dd HH:mm')}"></span>
     (<span th:text="${lastUpdatedCellName}"></span>)
   </p>
-</div>
-
-<!-- 예외 모달 -->
-<div id="errorModal" style="display: none; position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
-  <div style="background: white; padding: 20px 30px; border-radius: 10px; text-align: center;">
-    <p id="modalErrorMessage" style="margin-bottom: 20px;"></p>
-    <button onclick="closeModal()">확인</button>
-  </div>
 </div>
 
 <div th:replace="~{nav :: bottom-nav}"></div>

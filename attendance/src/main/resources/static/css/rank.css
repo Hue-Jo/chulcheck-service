@@ -82,10 +82,6 @@ th:nth-child(3), td:nth-child(3) {
   width: 25%;
 }
 
-.active-nav span:first-child {
-  filter: drop-shadow(0 0 3px black);
-}
-
 .pagination {
   margin-top: 20px;
   text-align: center;

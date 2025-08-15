@@ -78,12 +78,20 @@ public class AttendanceController {
   @GetMapping("/attendance/form")
   public String showAttendanceForm(
       HttpSession session,
-      @RequestParam Long cellId, Model model) {
+      @RequestParam Long cellId,
+      Model model) {
 
     if (isNotAuthenticated(session)) {
       log.warn("비인증 사용자가 접근 시도");
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
+
+    LocalDate today = LocalDate.now();
+    if (attendanceService.alreadySubmitted(cellId, today)) {
+      log.info("이미 제출된 셀 [{}]의 출석부. 수정 화면으로 이동", cellId);
+      return "redirect:/attendance/edit?cellId=" + cellId;
+    }
+
     model.addAttribute("formDto", buildFormViewDto(cellId, false));
     return "attendance_form";
   }
