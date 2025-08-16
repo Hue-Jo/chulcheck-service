@@ -36,5 +36,5 @@
 }
 
 .active-nav span:first-child {
-  filter: drop-shadow(0 0 3px black);
+  filter: drop-shadow(0 0 4px white);
 }
