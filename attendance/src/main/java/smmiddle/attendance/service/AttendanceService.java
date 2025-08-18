@@ -232,6 +232,20 @@ public class AttendanceService {
     return attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
   }
 
+  /**
+   * 특정 학생이 이전주에 장결자로 표시되었는지 확인
+   */
+  public boolean isLongTermLastWeek(Long studentId, LocalDate date) {
+    LocalDate lastWeek = date.minusWeeks(1);
+    return attendanceRepository.findByStudent_IdAndDate(studentId, lastWeek)
+        .map(attendance -> attendance.getStatus() == AttendanceStatus.ABSENT && attendance.getAbsenceReason() == AbsenceReason.LONG_TERM)
+        .orElse(false);
+  }
+
+
+  /**
+   * DB에 저장된 출석정보 불러오는 메서드
+   */
   public Map<Long, Attendance> getAttendanceMap(Long cellId, LocalDate date) {
     List<Attendance> attendances = getAttendancesByCellIdAndDate(cellId, date);
     return attendances.stream()
