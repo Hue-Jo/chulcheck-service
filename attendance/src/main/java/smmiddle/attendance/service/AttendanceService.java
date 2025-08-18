@@ -3,6 +3,7 @@ package smmiddle.attendance.service;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import smmiddle.attendance.constant.AbsenceReason;
 import smmiddle.attendance.constant.AttendanceStatus;
 import smmiddle.attendance.dto.AllAttendanceSummaryDto;
+import smmiddle.attendance.dto.AttendanceFormViewDto;
 import smmiddle.attendance.dto.CellAttendanceSummaryDto;
 import smmiddle.attendance.dto.RecordDto;
 import smmiddle.attendance.entity.Attendance;
@@ -139,6 +141,20 @@ public class AttendanceService {
     }
 
     return new AllAttendanceSummaryDto(attendanceStatusMap, allSubmitted, todayPresentCount);
+  }
+
+  /**
+   * 출석 폼 뷰 DTO 생성
+   */
+  public AttendanceFormViewDto buildFormViewDto(Long cellId, boolean isEdit) {
+    return AttendanceFormViewDto.builder()
+        .cell(getCellById(cellId))
+        .students(getAllStudentsByCellId(cellId))
+        .today(LocalDate.now())
+        .absenceReasons(List.of(AbsenceReason.values()))
+        .attendanceMap(isEdit ? getAttendanceMap(cellId, LocalDate.now()) : Collections.emptyMap())
+        .isEdit(isEdit)
+        .build();
   }
 
   /**
