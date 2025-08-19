@@ -147,12 +147,35 @@ public class AttendanceService {
    * 출석 폼 뷰 DTO 생성
    */
   public AttendanceFormViewDto buildFormViewDto(Long cellId, boolean isEdit) {
+
+    LocalDate today = LocalDate.now();
+    List<Student> students = getAllStudentsByCellId(cellId);
+
+    Map<Long, Attendance> attendanceMap = isEdit
+        ? getAttendanceMap(cellId, today)
+        : new HashMap<>();
+
+    if (!isEdit) {
+      for (Student student : students) {
+        boolean wasLongTerm = isLongTermLastAttendance(student.getId());
+        if (wasLongTerm) {
+          Attendance autoAbsent = Attendance.builder()
+              .student(student)
+              .date(today)
+              .status(AttendanceStatus.ABSENT)
+              .absenceReason(AbsenceReason.LONG_TERM)
+              .build();
+          attendanceMap.put(student.getId(), autoAbsent);
+        }
+      }
+    }
+
     return AttendanceFormViewDto.builder()
         .cell(getCellById(cellId))
         .students(getAllStudentsByCellId(cellId))
         .today(LocalDate.now())
         .absenceReasons(List.of(AbsenceReason.values()))
-        .attendanceMap(isEdit ? getAttendanceMap(cellId, LocalDate.now()) : Collections.emptyMap())
+        .attendanceMap(attendanceMap)
         .isEdit(isEdit)
         .build();
   }

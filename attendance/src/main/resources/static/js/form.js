@@ -1,27 +1,25 @@
 
 function toggleReasonInput(studentId) {
-  const presentRadio = document.querySelector(
-      `input[name='status_${studentId}'][value='PRESENT']`
-  );
+  const presentRadio = document.querySelector(`input[name='status_${studentId}'][value='PRESENT']`);
+  const absentRadio = document.querySelector(`input[name='status_${studentId}'][value='ABSENT']`);
   const reasonSection = document.querySelector(`#reasonSection_${studentId}`);
+  const select = reasonSection.querySelector('select');
+  const customInput = reasonSection.querySelector('input[type="text"]');
 
   if (presentRadio.checked) {
     reasonSection.style.display = 'none';
-    const select = reasonSection.querySelector('select');
-    const customInput = reasonSection.querySelector('input[type="text"]');
     select.value = '';
     select.required = false;
     customInput.style.display = 'none';
     customInput.value = '';
-  } else {
+  } else if (absentRadio.checked) {
     reasonSection.style.display = 'flex';
-    const select = reasonSection.querySelector('select');
-    const customInput = reasonSection.querySelector('input[type="text"]');
     select.required = true;
     toggleCustomReason(studentId);
   }
 }
 
+// 커스텀 사유 입력창 토글
 function toggleCustomReason(studentId) {
   const select = document.getElementById(`reasonSelect_${studentId}`);
   const customInput = document.getElementById(`customReason_${studentId}`);
@@ -34,8 +32,8 @@ function toggleCustomReason(studentId) {
   }
 }
 
+// 페이지 로드 시 기존 상태에 따라 사유 입력창 토글
 document.addEventListener('DOMContentLoaded', () => {
-  // 페이지 로드 시 기존 상태에 따라 사유 입력창 토글
   document.querySelectorAll('.student-card').forEach(card => {
     const studentId = card.querySelector("input[type='radio']").name.replace('status_', '');
     toggleReasonInput(studentId);
