@@ -249,12 +249,12 @@ public class AttendanceService {
   }
 
   /**
-   * 특정 학생이 이전주에 장결자로 표시되었는지 확인
+   * 특정 학생이 최근 출석에서 장결자로 표시되었는지 확인 (출석부를 제출하지 않은 경우를 위해 이전주가 아닌 최신 출석으로 확인)
    */
-  public boolean isLongTermLastWeek(Long studentId, LocalDate date) {
-    LocalDate lastWeek = date.minusWeeks(1);
-    return attendanceRepository.findByStudent_IdAndDate(studentId, lastWeek)
-        .map(attendance -> attendance.getStatus() == AttendanceStatus.ABSENT && attendance.getAbsenceReason() == AbsenceReason.LONG_TERM)
+  public boolean isLongTermLastAttendance(Long studentId) {
+    return attendanceRepository.findTopByStudent_IdOrderByDateDesc(studentId)
+        .map(att -> att.getStatus() == AttendanceStatus.ABSENT
+            && att.getAbsenceReason() == AbsenceReason.LONG_TERM)
         .orElse(false);
   }
 
