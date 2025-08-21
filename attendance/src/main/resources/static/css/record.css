@@ -177,7 +177,7 @@ th {
 /* 이름 칸 */
 table th:nth-child(1),
 table td:nth-child(1) {
-  width: 20%;
+  width: 25%;
   white-space: nowrap;   /* 줄바꿈 금지 */
   overflow: hidden;      /* 칸 너비를 넘어가는 내용 숨김 */
   text-overflow: ellipsis; /* 숨겨진 부분은 …으로 표시 */
@@ -193,7 +193,7 @@ table td:nth-child(2) {
 /* 결석 사유 칸 */
 table th:nth-child(3),
 table td:nth-child(3) {
-  width: 70%;
+  width: 65%;
   white-space: normal; /* 줄바꿈 허용 */
   word-break: break-word; /* 긴 단어도 줄바꿈 */
 }
