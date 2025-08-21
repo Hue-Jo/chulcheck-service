@@ -164,7 +164,7 @@ th {
   box-shadow: 0 0 6px rgba(0,0,0,0.1);
   padding: 15px;
   scroll-snap-align: start;
-  flex: 0 0 320px;
+  flex: 0 0 100%;
 }
 
 .card h3 {
@@ -174,24 +174,45 @@ th {
   color: #3f51b5;
 }
 
+/* 이름 칸 */
+table th:nth-child(1),
+table td:nth-child(1) {
+  width: 20%;
+  white-space: nowrap;   /* 줄바꿈 금지 */
+  overflow: hidden;      /* 칸 너비를 넘어가는 내용 숨김 */
+  text-overflow: ellipsis; /* 숨겨진 부분은 …으로 표시 */
+}
+
+/* 출결 칸 */
+table th:nth-child(2),
+table td:nth-child(2) {
+  width: 10%;
+  white-space: nowrap;
+}
+
+/* 결석 사유 칸 */
+table th:nth-child(3),
+table td:nth-child(3) {
+  width: 70%;
+  white-space: normal; /* 줄바꿈 허용 */
+  word-break: break-word; /* 긴 단어도 줄바꿈 */
+}
+
 @media (min-width: 600px) {
   .card-wrapper {
     flex: 0 0 45%;
-    /*width: 45%;*/
   }
 }
 
 @media (min-width: 900px) {
   .card-wrapper {
     flex: 0 0 30%;
-    /*width: 30%;*/
   }
 }
 
 @media (min-width: 1200px) {
   .card-wrapper {
     flex: 0 0 22%;
-    /*width: 22%;*/
   }
 }
 

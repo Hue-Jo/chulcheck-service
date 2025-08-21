@@ -20,4 +20,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
   List<LocalDate> findDistinctDates();
 
   Optional<Attendance> findTopByUpdatedDateIsNotNullOrderByUpdatedDateDesc();
+
+  Optional<Attendance> findTopByStudent_IdOrderByDateDesc(Long studentId);
 }

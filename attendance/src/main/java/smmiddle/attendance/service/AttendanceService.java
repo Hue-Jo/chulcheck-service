@@ -3,6 +3,7 @@ package smmiddle.attendance.service;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import smmiddle.attendance.constant.AbsenceReason;
 import smmiddle.attendance.constant.AttendanceStatus;
 import smmiddle.attendance.dto.AllAttendanceSummaryDto;
+import smmiddle.attendance.dto.AttendanceFormViewDto;
 import smmiddle.attendance.dto.CellAttendanceSummaryDto;
 import smmiddle.attendance.dto.RecordDto;
 import smmiddle.attendance.entity.Attendance;
@@ -142,6 +144,43 @@ public class AttendanceService {
   }
 
   /**
+   * 출석 폼 뷰 DTO 생성
+   */
+  public AttendanceFormViewDto buildFormViewDto(Long cellId, boolean isEdit) {
+
+    LocalDate today = LocalDate.now();
+    List<Student> students = getAllStudentsByCellId(cellId);
+
+    Map<Long, Attendance> attendanceMap = isEdit
+        ? getAttendanceMap(cellId, today)
+        : new HashMap<>();
+
+    if (!isEdit) {
+      for (Student student : students) {
+        boolean wasLongTerm = isLongTermLastAttendance(student.getId());
+        if (wasLongTerm) {
+          Attendance autoAbsent = Attendance.builder()
+              .student(student)
+              .date(today)
+              .status(AttendanceStatus.ABSENT)
+              .absenceReason(AbsenceReason.LONG_TERM)
+              .build();
+          attendanceMap.put(student.getId(), autoAbsent);
+        }
+      }
+    }
+
+    return AttendanceFormViewDto.builder()
+        .cell(getCellById(cellId))
+        .students(getAllStudentsByCellId(cellId))
+        .today(LocalDate.now())
+        .absenceReasons(List.of(AbsenceReason.values()))
+        .attendanceMap(attendanceMap)
+        .isEdit(isEdit)
+        .build();
+  }
+
+  /**
    * 출석정보 제출/수정
    */
   @Transactional
@@ -232,6 +271,20 @@ public class AttendanceService {
     return attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
   }
 
+  /**
+   * 특정 학생이 최근 출석에서 장결자로 표시되었는지 확인 (출석부를 제출하지 않은 경우를 위해 이전주가 아닌 최신 출석으로 확인)
+   */
+  public boolean isLongTermLastAttendance(Long studentId) {
+    return attendanceRepository.findTopByStudent_IdOrderByDateDesc(studentId)
+        .map(att -> att.getStatus() == AttendanceStatus.ABSENT
+            && att.getAbsenceReason() == AbsenceReason.LONG_TERM)
+        .orElse(false);
+  }
+
+
+  /**
+   * DB에 저장된 출석정보 불러오는 메서드
+   */
   public Map<Long, Attendance> getAttendanceMap(Long cellId, LocalDate date) {
     List<Attendance> attendances = getAttendancesByCellIdAndDate(cellId, date);
     return attendances.stream()

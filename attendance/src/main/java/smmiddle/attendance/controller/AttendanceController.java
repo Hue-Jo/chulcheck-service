@@ -92,7 +92,7 @@ public class AttendanceController {
       return "redirect:/attendance/edit?cellId=" + cellId;
     }
 
-    model.addAttribute("formDto", buildFormViewDto(cellId, false));
+    model.addAttribute("formDto", attendanceService.buildFormViewDto(cellId, false));
     return "attendance_form";
   }
 
@@ -107,20 +107,10 @@ public class AttendanceController {
       return "redirect:/auth";  // 인증 안 됐으면 인증 페이지로 보내기
     }
 
-    model.addAttribute("formDto", buildFormViewDto(cellId, true));
+    model.addAttribute("formDto", attendanceService.buildFormViewDto(cellId, true));
     return "attendance_form";
   }
 
 
-  private AttendanceFormViewDto buildFormViewDto(Long cellId, boolean isEdit) {
-    return AttendanceFormViewDto.builder()
-        .cell(attendanceService.getCellById(cellId))
-        .students(attendanceService.getAllStudentsByCellId(cellId))
-        .today(LocalDate.now())
-        .absenceReasons(List.of(AbsenceReason.values()))
-        .attendanceMap(isEdit ? attendanceService.getAttendanceMap(cellId, LocalDate.now()) : Collections.emptyMap())
-        .isEdit(isEdit)
-        .build();
-  }
 }
 
