@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -170,9 +171,17 @@ public class AttendanceService {
       }
     }
 
+    // 장결자는 하단으로 내려가게 정렬
+    students = students.stream()
+        .sorted(Comparator
+            .comparing((Student s) -> isLongTermLastAttendance(s.getId())) // 일반 학생(false)이 장결자(true) 보다 먼저
+            .thenComparing(Student::getName)) // 이름은 오름차순
+        .toList();
+
     return AttendanceFormViewDto.builder()
         .cell(getCellById(cellId))
-        .students(getAllStudentsByCellId(cellId))
+        //.students(getAllStudentsByCellId(cellId))
+        .students(students)
         .today(LocalDate.now())
         .absenceReasons(List.of(AbsenceReason.values()))
         .attendanceMap(attendanceMap)
