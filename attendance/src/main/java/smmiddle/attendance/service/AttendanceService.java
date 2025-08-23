@@ -3,7 +3,6 @@ package smmiddle.attendance.service;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -174,7 +173,8 @@ public class AttendanceService {
     // 장결자는 하단으로 내려가게 정렬
     students = students.stream()
         .sorted(Comparator
-            .comparing((Student s) -> isLongTermLastAttendance(s.getId())) // 일반 학생(false)이 장결자(true) 보다 먼저
+            .comparing(
+                (Student s) -> isLongTermLastAttendance(s.getId())) // 일반 학생(false)이 장결자(true) 보다 먼저
             .thenComparing(Student::getName)) // 이름은 오름차순
         .toList();
 
@@ -273,7 +273,7 @@ public class AttendanceService {
 
 
   /**
-   셀 ID + 날짜로 출석 정보 가져오기
+   * 셀 ID + 날짜로 출석 정보 가져오기
    */
   public List<Attendance> getAttendancesByCellIdAndDate(Long cellId, LocalDate date) {
     log.debug("셀 ID [{}], 날짜 [{}]의 출석 정보 조회", cellId, date);
