@@ -37,4 +37,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
       @Param("maxAbsence") long maxAbsence,
       Pageable pageable
   );
+
+  List<Student> findByName(String name);
 }
