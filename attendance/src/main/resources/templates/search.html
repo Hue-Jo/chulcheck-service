@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>학생 검색</title>
+</head>
+<body>
+<h2>학생별 출결 확인</h2>
+
+<!-- 검색 폼 -->
+<form th:action="@{/attendance/students}" method="get">
+  <input type="text" name="name" placeholder="학생 이름" required>
+  <button type="submit">검색</button>
+</form>
+
+<!-- 검색 결과 없음 메시지 -->
+<p th:if="${message}" th:text="${message}" style="color: black;"></p>
+
+</body>
+</html>
