@@ -3,18 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <title>학생 검색</title>
+  <style>
+    .error {
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .result {
+      margin-top: 20px;
+    }
+    .student {
+      padding: 5px 0;
+      border-bottom: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
-<h2>학생별 출결 확인</h2>
+<h1>학생 검색</h1>
 
 <!-- 검색 폼 -->
-<form th:action="@{/attendance/students}" method="get">
-  <input type="text" name="name" placeholder="학생 이름" required>
+<form th:action="@{/students/search}" method="get">
+  <input type="text" name="name" placeholder="학생 이름 입력" required>
   <button type="submit">검색</button>
 </form>
 
-<!-- 검색 결과 없음 메시지 -->
-<p th:if="${message}" th:text="${message}" style="color: black;"></p>
+<!-- 검색 결과 -->
+<div class="result">
+  <!-- 결과 없음 -->
+  <p th:if="${noResult}" class="error">검색 결과가 없습니다.</p>
+
+  <!-- 동명이인 여러 명일 때 -->
+  <div th:if="${students != null and students.size() > 1}">
+    <p>검색된 학생 목록:</p>
+    <ul>
+      <li th:each="student : ${students}" class="student">
+        <span th:text="${student.name}"></span>
+        (<span th:text="${student.cell.name}"></span>)
+        <a th:href="@{/students/{id}(id=${student.id})}"></a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 한 명만 있을 때 -->
+  <div th:if="${students != null and students.size() == 1}">
+    <p>검색 결과:</p>
+    <div class="student">
+      <span th:text="${students[0].name}"></span>
+      <span th:text="${students[0].cell.name}"></span>
+      <a th:href="@{/students/{id}id=${students[0].id}}"></a>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

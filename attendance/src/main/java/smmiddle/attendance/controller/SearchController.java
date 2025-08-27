@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import smmiddle.attendance.dto.StudentAttendanceDto;
 import smmiddle.attendance.dto.StudentDto;
 import smmiddle.attendance.repository.StudentRepository;
 import smmiddle.attendance.service.AttendanceService;
@@ -42,8 +44,26 @@ public class SearchController {
       model.addAttribute("message", "검색 결과가 없습니다.");
       return "search"; // 검색 화면으로 리턴
     }
+
     // 해당 이름을 가진 동명이인이 있을 때
+    if (students.size() == 1) {
+      Long studentId = students.get(0).getId();
+      return "redirect:/search/students/" + studentId + "/attendance";
+    }
+    
     // 해당 이름을 가진 학생이 1명일 때
+    model.addAttribute("students", students);
+    return "search";
+  }
+
+  /**
+   * 특정 학생의 1년 출석 조회
+   */
+  @GetMapping("/students/{studentId}/attendance")
+  public String getYearlyAttendance(
+      @PathVariable Long studentId, Model model) {
+
+    return "until-now"; // 출석 상세 화면
   }
 
 
