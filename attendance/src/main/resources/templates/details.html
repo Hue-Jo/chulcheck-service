@@ -1,0 +1,17 @@
+<h2 th:text="${student.name} + '의 출석 내역'"></h2>
+<table>
+  <thead>
+  <tr>
+    <th>날짜</th>
+    <th>상태</th>
+    <th>사유</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="att : ${attendanceList}">
+    <td th:text="${att.date}"></td>
+    <td th:text="${att.status}"></td>
+    <td th:text="${att.absenceReason}"></td>
+  </tr>
+  </tbody>
+</table>

@@ -63,7 +63,7 @@ public class SearchController {
   public String getYearlyAttendance(
       @PathVariable Long studentId, Model model) {
 
-    return "until-now"; // 출석 상세 화면
+    return "details"; // 출석 상세 화면
   }
 
 
