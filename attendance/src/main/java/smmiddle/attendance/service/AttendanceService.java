@@ -59,11 +59,14 @@ public class AttendanceService {
       throw new ChulCheckException(ErrorCode.INVALID_CELL_ID);
     }
 
-    return cellRepository.findById(cellId)
+    Cell cell = cellRepository.findById(cellId)
         .orElseThrow(() -> {
           log.warn("셀 ID [{}]에 해당하는 셀이 존재하지 않습니다.", cellId);
           return new ChulCheckException(ErrorCode.CELL_NOT_FOUND);
         });
+
+    log.debug("{}셀 조회", cell.getName());
+    return cell;
   }
 
   /**
@@ -180,7 +183,6 @@ public class AttendanceService {
 
     return AttendanceFormViewDto.builder()
         .cell(getCellById(cellId))
-        //.students(getAllStudentsByCellId(cellId))
         .students(students)
         .today(LocalDate.now())
         .absenceReasons(List.of(AbsenceReason.values()))
@@ -219,6 +221,7 @@ public class AttendanceService {
 
         // ALLOWED 상태로 변경 조건
         if (absenceReason == AbsenceReason.NAVE || absenceReason == AbsenceReason.OTHER_CHURCH) {
+          log.info("학생 [{}] 결석 → 출석인정(ALLOWED) 처리", student.getName());
           status = AttendanceStatus.ALLOWED;
         }
       }

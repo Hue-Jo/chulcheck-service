@@ -30,11 +30,11 @@
 <!-- 검색 결과 -->
 <div class="result">
   <!-- 결과 없음 -->
-  <p th:if="${noResult}" class="error">검색 결과가 없습니다.</p>
+<!--  <p th:if="${noResult}" class="error">검색 결과가 없습니다.</p>-->
+  <p th:if="${students != null or students.isEmpty()}" class="error">검색 결과가 없습니다.</p>
 
   <!-- 동명이인 여러 명일 때 -->
   <div th:if="${students != null and students.size() > 1}">
-    <p>검색된 학생 목록:</p>
     <ul>
       <li th:each="student : ${students}" class="student">
         <span th:text="${student.name}"></span>
@@ -46,7 +46,6 @@
 
   <!-- 한 명만 있을 때 -->
   <div th:if="${students != null and students.size() == 1}">
-    <p>검색 결과:</p>
     <div class="student">
       <span th:text="${students[0].name}"></span>
       <span th:text="${students[0].cell.name}"></span>
