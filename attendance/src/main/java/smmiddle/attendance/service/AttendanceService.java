@@ -2,10 +2,8 @@ package smmiddle.attendance.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,8 +16,6 @@ import smmiddle.attendance.constant.AbsenceReason;
 import smmiddle.attendance.constant.AttendanceStatus;
 import smmiddle.attendance.dto.AllAttendanceSummaryDto;
 import smmiddle.attendance.dto.AttendanceFormViewDto;
-import smmiddle.attendance.dto.CellAttendanceSummaryDto;
-import smmiddle.attendance.dto.RecordDto;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.entity.Student;
@@ -101,20 +97,6 @@ public class AttendanceService {
   }
 
   /**
-   * 특정 셀의 오늘 출석 학생 수 계산
-   */
-  public int getTodayPresentCount(Long cellId, LocalDate date) {
-    List<Attendance> attendances = attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
-
-    int count = (int) attendances.stream()
-        .filter(this::countsAsPresent)
-        .count();
-
-    log.debug("셀 ID [{}], 날짜 [{}]의 출석 인원 수: {}", cellId, date, count);
-    return count;
-  }
-
-  /**
    * 가장 최근 출첵한 셀 조회
    */
   public Optional<Attendance> getLatestAttendance() {
@@ -141,6 +123,20 @@ public class AttendanceService {
     }
 
     return new AllAttendanceSummaryDto(attendanceStatusMap, allSubmitted, todayPresentCount);
+  }
+
+  /**
+   * 특정 셀의 오늘 출석 학생 수 계산
+   */
+  public int getTodayPresentCount(Long cellId, LocalDate date) {
+    List<Attendance> attendances = attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
+
+    int count = (int) attendances.stream()
+        .filter(this::countsAsPresent)
+        .count();
+
+    log.debug("셀 ID [{}], 날짜 [{}]의 출석 인원 수: {}", cellId, date, count);
+    return count;
   }
 
   /**
@@ -180,7 +176,6 @@ public class AttendanceService {
 
     return AttendanceFormViewDto.builder()
         .cell(getCellById(cellId))
-        //.students(getAllStudentsByCellId(cellId))
         .students(students)
         .today(LocalDate.now())
         .absenceReasons(List.of(AbsenceReason.values()))
@@ -188,6 +183,27 @@ public class AttendanceService {
         .isEdit(isEdit)
         .build();
   }
+
+
+  /**
+   * DB에 저장된 출석정보 불러오는 메서드
+   */
+  public Map<Long, Attendance> getAttendanceMap(Long cellId, LocalDate date) {
+    List<Attendance> attendances = getAttendancesByCellIdAndDate(cellId, date);
+    return attendances.stream()
+        .collect(Collectors.toMap(
+            attendance -> attendance.getStudent().getId(),
+            attendance -> attendance));
+  }
+
+  /**
+   * 셀 ID + 날짜로 출석 정보 가져오기
+   */
+  public List<Attendance> getAttendancesByCellIdAndDate(Long cellId, LocalDate date) {
+    log.debug("셀 ID [{}], 날짜 [{}]의 출석 정보 조회", cellId, date);
+    return attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
+  }
+
 
   /**
    * 출석정보 제출/수정
@@ -246,39 +262,6 @@ public class AttendanceService {
     return hasExisting ? "수정" : "제출";
   }
 
-  /**
-   * 출석이 저장된 모든 날짜 목록 조회
-   */
-  public List<LocalDate> getAllAttendanceDates() {
-    return attendanceRepository.findDistinctDates();
-  }
-
-  /**
-   * 특정 날짜의 모든 셀의 출결사항 조회 & 각 셀의 총 출석수 조회
-   */
-  public Map<Cell, RecordDto> getAllCellsAttendanceByDateWithCount(LocalDate date) {
-    List<Cell> cells = cellRepository.findAll();
-    Map<Cell, RecordDto> result = new LinkedHashMap<>();
-
-    for (Cell cell : cells) {
-      List<Attendance> attList = getAttendancesByCellIdAndDate(cell.getId(), date);
-      long presentCount = attList.stream()
-          .filter(this::countsAsPresent)
-          .count();
-      result.put(cell, new RecordDto(attList, presentCount));
-    }
-
-    return result;
-  }
-
-
-  /**
-   * 셀 ID + 날짜로 출석 정보 가져오기
-   */
-  public List<Attendance> getAttendancesByCellIdAndDate(Long cellId, LocalDate date) {
-    log.debug("셀 ID [{}], 날짜 [{}]의 출석 정보 조회", cellId, date);
-    return attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
-  }
 
   /**
    * 특정 학생이 최근 출석에서 장결자로 표시되었는지 확인 (출석부를 제출하지 않은 경우를 위해 이전주가 아닌 최신 출석으로 확인)
@@ -289,45 +272,5 @@ public class AttendanceService {
             && att.getAbsenceReason() == AbsenceReason.LONG_TERM)
         .orElse(false);
   }
-
-
-  /**
-   * DB에 저장된 출석정보 불러오는 메서드
-   */
-  public Map<Long, Attendance> getAttendanceMap(Long cellId, LocalDate date) {
-    List<Attendance> attendances = getAttendancesByCellIdAndDate(cellId, date);
-    return attendances.stream()
-        .collect(Collectors.toMap(
-            attendance -> attendance.getStudent().getId(),
-            attendance -> attendance));
-  }
-
-  /**
-   * 출결정보 조회 화면의 요약본
-   */
-  public List<CellAttendanceSummaryDto> getTodayCellAttendanceSummary() {
-    LocalDate today = LocalDate.now();
-    List<Cell> cells = cellRepository.findAll();
-    List<CellAttendanceSummaryDto> summaries = new ArrayList<>();
-
-    for (Cell cell : cells) {
-      boolean submitted = attendanceRepository.existsByStudent_Cell_IdAndDate(cell.getId(), today);
-
-      String presentCountDisplay;
-      if (submitted) {
-        List<Attendance> attendances = attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cell.getId(), today);
-        long presentCount = attendances.stream()
-            .filter(this::countsAsPresent)
-            .count();
-        presentCountDisplay = presentCount + "명";
-      } else {
-        presentCountDisplay = "⌛";
-      }
-
-      summaries.add(new CellAttendanceSummaryDto(cell.getName(), submitted, presentCountDisplay));
-    }
-
-    return summaries;
-  }
-
+  
 }
