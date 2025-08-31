@@ -18,6 +18,7 @@ import smmiddle.attendance.dto.RecordDto;
 import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.service.AttendanceService;
+import smmiddle.attendance.service.RecordService;
 
 @Controller
 @RequiredArgsConstructor
@@ -25,13 +26,14 @@ import smmiddle.attendance.service.AttendanceService;
 public class RecordController {
 
   private final AttendanceService attendanceService;
+  private final RecordService recordService;
 
 
   @GetMapping("/attendance/records")
   public String viewAttendanceRecords(
       HttpSession session,
-      //@RequestParam(name = "cellId", required = false) Long cellId,
-      @RequestParam(name = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+      @RequestParam(name = "date", required = false)
+      @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
       Model model) {
 
     if (isNotAuthenticated(session)) {
@@ -44,17 +46,17 @@ public class RecordController {
     model.addAttribute("cells", cells);
 
     // 날짜 목록 전달 (출석 기록 있는 날짜만)
-    List<LocalDate> attendanceDates = attendanceService.getAllAttendanceDates();
+    List<LocalDate> attendanceDates = recordService.getAllAttendanceDates();
     model.addAttribute("dates", attendanceDates);
 
     // 날짜 또는 셀이 선택되지 않은 경우, 전체 셀 출결 요약
     if (date == null) {
-      List<CellAttendanceSummaryDto> summaryList = attendanceService.getTodayCellAttendanceSummary();
+      List<CellAttendanceSummaryDto> summaryList = recordService.getTodayCellAttendanceSummary();
       model.addAttribute("summaryList", summaryList);
       return "attendance_records";
     }
 
-    Map<Cell, RecordDto> cellAttendanceMap = attendanceService.getAllCellsAttendanceByDateWithCount(date);
+    Map<Cell, RecordDto> cellAttendanceMap = recordService.getAllCellsAttendanceByDateWithCount(date);
     model.addAttribute("cellAttendanceMap", cellAttendanceMap);
     model.addAttribute("selectedDate", date.toString());
 
