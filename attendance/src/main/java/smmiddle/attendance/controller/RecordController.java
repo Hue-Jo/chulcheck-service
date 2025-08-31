@@ -60,6 +60,9 @@ public class RecordController {
     model.addAttribute("cellAttendanceMap", cellAttendanceMap);
     model.addAttribute("selectedDate", date.toString());
 
+    long totalPresentAndAllowedCount = recordService.getTotalPresentAndAllowedCountByDate(date);
+    model.addAttribute("totalPresentAndAllowedCount", totalPresentAndAllowedCount);
+
     return "attendance_records";
   }
 }

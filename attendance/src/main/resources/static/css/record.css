@@ -69,6 +69,12 @@ button[type="submit"] {
   padding: 10px 20px;
 }
 
+.date-summary {
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
 hr {
   border: none;
   border-top: 1px solid #ddd;

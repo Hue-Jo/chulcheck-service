@@ -29,6 +29,12 @@
   </select>
 </form>
 
+<div th:if="${selectedDate != null}" class="date-summary">
+  <p>📊 총
+    <strong><span th:text="${totalPresentAndAllowedCount}"></span></strong>
+    명 출석</p>
+</div>
+
 <hr/>
 
 <div th:if="${summaryList != null} and ${attendances} == null">

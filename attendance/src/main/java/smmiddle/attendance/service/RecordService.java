@@ -51,6 +51,16 @@ public class RecordService {
   }
 
   /**
+   * 특정 날짜의 전체 출석 합계
+   */
+  public long getTotalPresentAndAllowedCountByDate(LocalDate date) {
+    List<Attendance> attendances = attendanceRepository.findByDate(date);
+    return attendances.stream()
+        .filter(attendanceService::countsAsPresent)
+        .count();
+  }
+
+  /**
    * 출결정보 조회 화면의 요약본
    */
   public List<CellAttendanceSummaryDto> getTodayCellAttendanceSummary() {
