@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import smmiddle.attendance.dto.AllAttendanceSummaryDto;
 import smmiddle.attendance.dto.CellAttendanceSummaryDto;
 import smmiddle.attendance.dto.RecordDto;
 import smmiddle.attendance.entity.Attendance;
@@ -60,8 +61,9 @@ public class RecordController {
     model.addAttribute("cellAttendanceMap", cellAttendanceMap);
     model.addAttribute("selectedDate", date.toString());
 
-    long totalPresentAndAllowedCount = recordService.getTotalPresentAndAllowedCountByDate(date);
-    model.addAttribute("totalPresentAndAllowedCount", totalPresentAndAllowedCount);
+    // 선택된 날짜 기준 출석 요약
+    AllAttendanceSummaryDto summary = attendanceService.getAttendanceSummary(date);
+    model.addAttribute("summary", summary);
 
     return "attendance_records";
   }
