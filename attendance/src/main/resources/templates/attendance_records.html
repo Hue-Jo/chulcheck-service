@@ -29,10 +29,20 @@
   </select>
 </form>
 
-<div th:if="${selectedDate != null}" class="date-summary">
-  <p>📊 총
-    <strong><span th:text="${totalPresentAndAllowedCount}"></span></strong>
-    명 출석</p>
+<!--<div th:if="${selectedDate != null}" class="date-summary">-->
+<!--  <p>📊 총-->
+<!--    <strong><span th:text="${totalPresentAndAllowedCount}"></span></strong>-->
+<!--    명 출석</p>-->
+<!--</div>-->
+
+<div th:if="${selectedDate != null and summary != null}" class="date-summary">
+  <p>📊 총 <strong th:text="${summary.todayPresentCount}"></strong> 명 출석</p>
+  <p th:if="${summary.unsubmittedCells != null and !summary.unsubmittedCells.isEmpty()}"
+     class="unsubmitted">
+    (⚠️ 미제출 셀 :
+    <span th:text="${#strings.listJoin(summary.unsubmittedCells, ', ')}"></span>
+    )
+  </p>
 </div>
 
 <hr/>

@@ -2,6 +2,7 @@ package smmiddle.attendance.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -111,18 +112,25 @@ public class AttendanceService {
     Map<Long, Boolean> attendanceStatusMap = new HashMap<>();
     boolean allSubmitted = true;
     int todayPresentCount = 0;
+    List<String> unsubmittedCells = new ArrayList<>();
 
     for (Cell cell : cells) {
       boolean submitted = alreadySubmitted(cell.getId(), today);
       attendanceStatusMap.put(cell.getId(), submitted);
       if (!submitted) {
         allSubmitted = false;
+        unsubmittedCells.add(cell.getName());  // 미제출 셀
       } else {
         todayPresentCount += getTodayPresentCount(cell.getId(), today);
       }
     }
 
-    return new AllAttendanceSummaryDto(attendanceStatusMap, allSubmitted, todayPresentCount);
+    return new AllAttendanceSummaryDto(
+        attendanceStatusMap,
+        allSubmitted,
+        unsubmittedCells,
+        todayPresentCount
+    );
   }
 
   /**
