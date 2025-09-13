@@ -112,16 +112,43 @@ public class AttendanceService {
     Map<Long, Boolean> attendanceStatusMap = new HashMap<>();
     boolean allSubmitted = true;
     int todayPresentCount = 0;
+    int naveCount = 0;
+    int otherChurchCount = 0;
     List<String> unsubmittedCells = new ArrayList<>();
+
+//    for (Cell cell : cells) {
+//      boolean submitted = alreadySubmitted(cell.getId(), today);
+//      attendanceStatusMap.put(cell.getId(), submitted);
+//      if (!submitted) {
+//        allSubmitted = false;
+//        unsubmittedCells.add(cell.getName());  // 미제출 셀
+//      } else {
+//        todayPresentCount += getTodayPresentCount(cell.getId(), today);
+//      }
+//    }
 
     for (Cell cell : cells) {
       boolean submitted = alreadySubmitted(cell.getId(), today);
       attendanceStatusMap.put(cell.getId(), submitted);
+
       if (!submitted) {
         allSubmitted = false;
-        unsubmittedCells.add(cell.getName());  // 미제출 셀
+        unsubmittedCells.add(cell.getName());
       } else {
-        todayPresentCount += getTodayPresentCount(cell.getId(), today);
+        List<Attendance> attendances =
+            attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cell.getId(), today);
+
+        for (Attendance att : attendances) {
+          if (countsAsPresent(att)) {
+            todayPresentCount++;
+          }
+          if (att.getStatus() == AttendanceStatus.ALLOWED && att.getAbsenceReason() == AbsenceReason.NAVE) {
+            naveCount++;
+          }
+          if (att.getStatus() == AttendanceStatus.ALLOWED && att.getAbsenceReason() == AbsenceReason.OTHER_CHURCH) {
+            otherChurchCount++;
+          }
+        }
       }
     }
 
@@ -129,23 +156,25 @@ public class AttendanceService {
         attendanceStatusMap,
         allSubmitted,
         unsubmittedCells,
-        todayPresentCount
+        todayPresentCount,
+        naveCount,
+        otherChurchCount
     );
   }
 
-  /**
-   * 특정 셀의 오늘 출석 학생 수 계산
-   */
-  public int getTodayPresentCount(Long cellId, LocalDate date) {
-    List<Attendance> attendances = attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
-
-    int count = (int) attendances.stream()
-        .filter(this::countsAsPresent)
-        .count();
-
-    log.debug("셀 ID [{}], 날짜 [{}]의 출석 인원 수: {}", cellId, date, count);
-    return count;
-  }
+//  /**
+//   * 특정 셀의 오늘 출석 학생 수 계산
+//   */
+//  public int getTodayPresentCount(Long cellId, LocalDate date) {
+//    List<Attendance> attendances = attendanceRepository.findByStudent_Cell_IdAndDateOrderByStudent_NameAsc(cellId, date);
+//
+//    int count = (int) attendances.stream()
+//        .filter(this::countsAsPresent)
+//        .count();
+//
+//    log.debug("셀 ID [{}], 날짜 [{}]의 출석 인원 수: {}", cellId, date, count);
+//    return count;
+//  }
 
   /**
    * 출석 폼 뷰 DTO 생성

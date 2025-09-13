@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import smmiddle.attendance.dto.AllAttendanceSummaryDto;
 import smmiddle.attendance.dto.CellAttendanceSummaryDto;
 import smmiddle.attendance.dto.RecordDto;
-import smmiddle.attendance.entity.Attendance;
 import smmiddle.attendance.entity.Cell;
 import smmiddle.attendance.service.AttendanceService;
 import smmiddle.attendance.service.RecordService;
