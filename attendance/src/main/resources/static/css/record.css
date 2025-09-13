@@ -75,7 +75,7 @@ button[type="submit"] {
   font-weight: bold;
 }
 
-.date-summary .unsubmitted {
+.sub-count, .date-summary .unsubmitted {
   font-size: 1rem;
   font-weight: normal;
   color: #555;

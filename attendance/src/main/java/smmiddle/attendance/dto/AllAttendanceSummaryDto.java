@@ -13,5 +13,6 @@ public class AllAttendanceSummaryDto {
   private final boolean allSubmitted; // 전체 셀 출석부 제출 여부
   private List<String> unsubmittedCells; // 출석부 미제출 셀 리스트
   private final int todayPresentCount; // 오늘 총 출석수
-
+  private final int naveCount;        // 본당 예배 출석 수
+  private final int otherChurchCount; // 타교회 출석 수
 }

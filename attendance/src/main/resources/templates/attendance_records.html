@@ -36,7 +36,13 @@
 <!--</div>-->
 
 <div th:if="${selectedDate != null and summary != null}" class="date-summary">
-  <p>📊 총 <strong th:text="${summary.todayPresentCount}"></strong> 명 출석</p>
+  <p>
+    📊 총 <strong th:text="${summary.todayPresentCount}"></strong> 명 출석
+    <span class="sub-count">
+      (본당: <span th:text="${summary.naveCount}"></span>,
+       타교회: <span th:text="${summary.otherChurchCount}"></span> 포함)
+    </span>
+  </p>
   <p th:if="${summary.unsubmittedCells != null and !summary.unsubmittedCells.isEmpty()}"
      class="unsubmitted">
     (⚠️ 미제출 셀 :
