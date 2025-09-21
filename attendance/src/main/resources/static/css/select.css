@@ -1,25 +1,48 @@
+:root {
+  --primary: #3f51b5;
+  }
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #fafafa;
   color: #333;
-  margin: 20px auto  80px;
+  margin: 10px auto  80px;
   max-width: 900px;
   padding: 0 20px;
 }
 
 .title-container {
   text-align: center;
-  margin-bottom: 10px;
 }
 
-.title-container h1 {
+.title-container h2 {
   color: #2c3e50;
-  padding-bottom: 8px;
-  border-bottom: 3px solid #2c3e50;
-  display: inline-block;
+  margin: 0;
 }
 
-.title-container h1 a {
+.title-container h2 a {
+  color: inherit;
+}
+
+.page-title-box {
+  display: inline-block;
+  background: white;
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  padding: 14px 28px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+  margin: 20px auto;
+  text-align: center;
+}
+
+.page-title-box h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.page-title-box h1 a {
   text-decoration: none;
   color: inherit;
 }
@@ -82,7 +105,7 @@ p {
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
-  padding: 35px 40px;
+  padding: 30px 40px;
   border-radius: 8px;
   font-weight: 500;
   font-size: 1.2rem;
