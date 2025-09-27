@@ -10,17 +10,19 @@
   <script th:inline="javascript" src="/js/select.js" defer></script>
   <script src="/js/nav.js"></script>
 </head>
-<body>
 
+<body>
 <div class="title-container">
-  <h1>🏠 출석부</h1>
+  <div class="page-title-box">
+    <h2>🏠 출석부</h2>
+  </div>
   <p th:if="${!isSunday}" class="not-sunday">
     출석 체크는 일요일에만 가능
   </p>
 </div>
 
 <!-- 출석 집계 현황 -->
-<div style="margin-top: 8px; text-align: center;">
+<div style="text-align: center;">
   <p th:if="${allSubmitted}" style="font-weight: bold; font-size: 1.3rem;">
     ☑️ 전체 출석 인원: <span th:text="${todayPresentCount}"></span>명
   </p>
@@ -48,7 +50,8 @@
 <!-- 토스트 메시지 -->
 <div th:if="${success}" class="message message-success" th:text="${success}"></div>
 <div th:if="${error}" class="message message-error" th:text="${error}"></div>
-<div th:if="${chulcheckErrorMessage}" class="message exception-error" th:text="${chulcheckErrorMessage}"></div>
+<div th:if="${chulcheckErrorMessage}" class="message exception-error"
+     th:text="${chulcheckErrorMessage}"></div>
 
 <!-- 최근 수정시간 -->
 <div th:if="${lastUpdatedTime != null and isSunday}" style="text-align: center; margin-top: 30px;">

@@ -15,30 +15,26 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 20px 30px 80px;
+  margin: 10px 20px 80px;
   background-color: #fafafa;
   color: #333;
 }
 
-h1, h2, h3 {
+h2, h3 {
   text-align: center;
-  color: #2c3e50;
 }
 
 .title-container {
   text-align: center;
-  margin-bottom: 10px;
 }
 
-.title-container h1 {
+.title-container h2 {
   color: #2c3e50;
-  padding-bottom: 8px;
-  border-bottom: 3px solid #2c3e50;
-  display: inline-block;
+  margin: 0;
 }
 
-.title-container h1 a {
-  text-decoration: none;
+.title-container h2 a {
+  text-decoration: none; /* 링크 밑줄 제거 */
   color: inherit;
 }
 
@@ -47,7 +43,27 @@ h1, h2, h3 {
   flex-direction: column;
   gap: 12px;
   align-items: stretch;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+}
+
+.page-title-box {
+  display: inline-block;
+  background: var(--primary);
+  border: var(--primary);
+  border-radius: 12px;
+  padding: 14px 28px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+  margin: 20px auto;
+  text-align: center;
+}
+
+.page-title-box h2 {
+  font-size: 1.6rem;
+  color: white;
+}
+
+.page-title-box h2 a {
+  color: inherit;
 }
 
 .form-control {
