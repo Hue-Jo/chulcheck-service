@@ -48,8 +48,8 @@ h2, h3 {
 
 .page-title-box {
   display: inline-block;
-  background: white;
-  border: 2px solid var(--primary);
+  background: var(--primary);
+  border: var(--primary);
   border-radius: 12px;
   padding: 14px 28px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.08);
@@ -57,14 +57,12 @@ h2, h3 {
   text-align: center;
 }
 
-.page-title-box h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--primary);
+.page-title-box h2 {
+  font-size: 1.6rem;
+  color: white;
 }
 
-.page-title-box h1 a {
+.page-title-box h2 a {
   color: inherit;
 }
 
