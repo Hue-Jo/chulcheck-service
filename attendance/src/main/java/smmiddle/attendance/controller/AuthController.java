@@ -1,5 +1,7 @@
 package smmiddle.attendance.controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +32,19 @@ public class AuthController {
   public String verifyCode(
       @RequestParam String code,
       HttpSession session,
+      HttpServletResponse response,
       RedirectAttributes redirectAttributes) {
     log.info("입력된 인증번호: {}", code);
 
     if (authService.verifyCode(code)) {
       session.setAttribute("authenticated", true); // 세션에 인증 플래그 저장
+
+      // 브라우저를 닫아도 인증이 유지되도록 쿠키 만료시간 설정
+      Cookie cookie = new Cookie("JSESSIONID", session.getId());
+      cookie.setMaxAge(60 * 60 * 12); // 12시간
+      cookie.setPath("/");
+      response.addCookie(cookie);
+
       return "redirect:/"; // 인증 성공 시 첫 화면으로 이동
 
     } else {
